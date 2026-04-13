@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Ticket {
+  id           String       @id @default(cuid())
+  number       String       @unique
+  clientName   String
+  clientEmail  String
+  clientPhone  String?
+  companyName  String?
+  lampModel    String
+  serialNumber String?
+  purchaseDate String?
+  description  String
+  status       TicketStatus @default(NEW)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  attachments  Attachment[]
+  notes        TicketNote[]
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fileName  String
+  fileUrl   String
+  fileSize  Int
+  mimeType  String
+  createdAt DateTime @default(now())
+}
+
+model TicketNote {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  content   String
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+}
+
+enum TicketStatus {
+  NEW
+  IN_PROGRESS
+  WAITING_FOR_PARTS
+  COMPLETED
+  CLOSED
+}

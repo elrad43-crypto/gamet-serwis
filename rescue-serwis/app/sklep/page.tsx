@@ -18,7 +18,7 @@ export default async function SklepPage() {
     }),
   ])
 
-  const products = rawProducts.map((p) => ({
+  const products = rawProducts.map((p: (typeof rawProducts)[number]) => ({
     id: p.id,
     name: p.name,
     slug: p.slug,
@@ -29,7 +29,7 @@ export default async function SklepPage() {
     category: p.category,
   }))
 
-  const categories = rawCategories.map((c) => ({
+  const categories = rawCategories.map((c: (typeof rawCategories)[number]) => ({
     id: c.id,
     name: c.name,
     slug: c.slug,

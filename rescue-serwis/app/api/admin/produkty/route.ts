@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   })
 
   return Response.json({
-    products: products.map((p) => ({
+    products: products.map((p: (typeof products)[number]) => ({
       ...p,
       price: p.price !== null ? parseFloat(p.price.toString()) : null,
     })),

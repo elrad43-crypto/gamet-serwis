@@ -7,7 +7,7 @@ export default async function KategoriePage() {
     orderBy: { name: 'asc' },
   })
 
-  const categories = raw.map((c) => ({
+  const categories = raw.map((c: (typeof raw)[number]) => ({
     id: c.id,
     name: c.name,
     slug: c.slug,

@@ -1,0 +1,5 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "cd rescue-serwis && npm run build",
+  "outputDirectory": "rescue-serwis/.next"
+}

@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Ticket {
+  id              String        @id @default(cuid())
+  number          String        @unique
+  // Jednostka / instytucja
+  institutionName String
+  unitName        String?
+  contactPerson   String
+  contactEmail    String
+  contactPhone    String
+  // Sprzęt
+  equipmentType   EquipmentType
+  equipmentModel  String
+  serialNumber    String?
+  equipmentYear   String?
+  // Zgłoszenie
+  description     String
+  priority        Priority      @default(NORMAL)
+  status          TicketStatus  @default(NEW)
+  // Daty
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  // Relacje
+  attachments     Attachment[]
+  notes           TicketNote[]
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fileName  String
+  fileUrl   String
+  fileSize  Int
+  mimeType  String
+  createdAt DateTime @default(now())
+}
+
+model TicketNote {
+  id        String     @id @default(cuid())
+  ticketId  String
+  ticket    Ticket     @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  content   String
+  isPublic  Boolean    @default(false)
+  authorId  String?
+  author    AdminUser? @relation(fields: [authorId], references: [id])
+  createdAt DateTime   @default(now())
+}
+
+model AdminUser {
+  id        String       @id @default(cuid())
+  email     String       @unique
+  password  String
+  name      String
+  role      AdminRole    @default(TECHNICIAN)
+  createdAt DateTime     @default(now())
+  notes     TicketNote[]
+}
+
+enum EquipmentType {
+  LAMP
+  SPEAKER
+  GENERATOR
+  SIREN
+  SIGNALLER
+  OTHER
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum TicketStatus {
+  NEW
+  DIAGNOSED
+  IN_REPAIR
+  WAITING_FOR_PARTS
+  READY_FOR_PICKUP
+  COMPLETED
+  CANCELLED
+}
+
+enum AdminRole {
+  ADMIN
+  TECHNICIAN
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  sku         String?
+  brand       String?
+  price       Decimal?
+  imageUrl    String?
+  inStock     Boolean   @default(true)
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  inquiries   Inquiry[]
+}
+
+enum InquiryStatus {
+  NEW
+  IN_PROGRESS
+  ANSWERED
+  CLOSED
+}
+
+model Inquiry {
+  id          String        @id @default(cuid())
+  number      String        @unique
+  name        String
+  email       String
+  phone       String?
+  message     String?
+  productId   String?
+  product     Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName String
+  quantity    Int           @default(1)
+  status      InquiryStatus @default(NEW)
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}

@@ -54,8 +54,6 @@ pracownicy serwisu zarządzają zgłoszeniami w panelu administracyjnym.
    - `NEXTAUTH_URL` – adres aplikacji lokalnie, np. `http://localhost:3000`
    - `RESEND_API_KEY` – klucz API Resend do wysyłki maili
    - `RESEND_FROM_EMAIL` – adres nadawcy maili (domyślnie `serwis@gamet.pl`)
-   - `SEED_SECRET` – sekret zabezpieczający jednorazowy endpoint tworzenia
-     pierwszego konta administratora
 
 3. Zastosuj schemat bazy danych i wygeneruj klienta Prisma:
 
@@ -74,9 +72,9 @@ pracownicy serwisu zarządzają zgłoszeniami w panelu administracyjnym.
 
 ### Pierwsze konto administratora
 
-Pierwsze konto administratora tworzy się jednorazowym żądaniem
-`POST /api/admin/seed`, zabezpieczonym wartością `SEED_SECRET`. Endpoint
-powinien zostać usunięty lub dodatkowo zabezpieczony po pierwszym użyciu.
+Pierwsze konto administratora tworzy się lokalnym skryptem (np.
+`node create-admin.mjs`, poza repo) – nie istnieje publiczny endpoint HTTP
+do tworzenia adminów, żeby nie wystawiać tej operacji na świat.
 
 ## Skrypty
 

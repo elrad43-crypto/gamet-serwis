@@ -14,14 +14,14 @@ export default function Home() {
             Serwis lamp ostrzegawczych
           </h2>
           <p className="text-gray-600 mb-6">
-            Masz problem z lamp� ostrzegawcz� Gamet? Z�� zg�oszenie serwisowe �
-            nasi specjali�ci zajm� si� Twoim urz�dzeniem.
+            Masz problem z lampą ostrzegawczą Gamet? Złóż zgłoszenie serwisowe –
+            nasi specjaliści zajmą się Twoim urządzeniem.
           </p>
           <Link
             href="/zgloszenie"
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors"
           >
-            Z�� zg�oszenie serwisowe
+            Złóż zgłoszenie serwisowe
           </Link>
         </div>
 
@@ -32,7 +32,7 @@ export default function Home() {
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <div className="text-2xl font-bold text-blue-600 mb-1">100%</div>
-            <div>Oryginalne cz�ci</div>
+            <div>Oryginalne części</div>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <div className="text-2xl font-bold text-blue-600 mb-1">Gwarancja</div>

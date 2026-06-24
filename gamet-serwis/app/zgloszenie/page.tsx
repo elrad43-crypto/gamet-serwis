@@ -42,14 +42,14 @@ export default function ZgloszenieForm() {
 
   function validate(): boolean {
     const newErrors: Partial<FormData> = {}
-    if (!form.clientName.trim()) newErrors.clientName = 'Imi� i nazwisko jest wymagane'
+    if (!form.clientName.trim()) newErrors.clientName = 'Imię i nazwisko jest wymagane'
     if (!form.clientEmail.trim()) newErrors.clientEmail = 'Email jest wymagany'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.clientEmail))
-      newErrors.clientEmail = 'Nieprawid�owy adres email'
+      newErrors.clientEmail = 'Nieprawidłowy adres email'
     if (!form.lampModel) newErrors.lampModel = 'Wybierz model lampy'
     if (!form.description.trim()) newErrors.description = 'Opis usterki jest wymagany'
     else if (form.description.trim().length < 10)
-      newErrors.description = 'Opis musi mie� co najmniej 10 znak�w'
+      newErrors.description = 'Opis musi mieć co najmniej 10 znaków'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -66,12 +66,12 @@ export default function ZgloszenieForm() {
         body: JSON.stringify(form),
       })
 
-      if (!res.ok) throw new Error('B��d serwera')
+      if (!res.ok) throw new Error('Błąd serwera')
 
       const data = await res.json()
       router.push(`/zgloszenie/potwierdzenie?nr=${data.ticket.number}`)
     } catch {
-      setErrors({ description: 'Wyst�pi� b��d. Spr�buj ponownie.' })
+      setErrors({ description: 'Wystąpił błąd. Spróbuj ponownie.' })
     } finally {
       setLoading(false)
     }
@@ -92,16 +92,16 @@ export default function ZgloszenieForm() {
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <Link href="/" className="text-blue-600 hover:underline text-sm">
-            � Powr�t do strony g��wnej
+            ← Powrót do strony głównej
           </Link>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
-            Zg�oszenie serwisowe
+            Zgłoszenie serwisowe
           </h1>
           <p className="text-gray-500 mb-8 text-sm">
-            Wype�nij formularz, a skontaktujemy si� z Tob� w ci�gu 24 godzin.
+            Wypełnij formularz, a skontaktujemy się z Tobą w ciągu 24 godzin.
           </p>
 
           <form onSubmit={handleSubmit} noValidate>
@@ -113,7 +113,7 @@ export default function ZgloszenieForm() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Imi� i nazwisko <span className="text-red-500">*</span>
+                  Imię i nazwisko <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -178,9 +178,9 @@ export default function ZgloszenieForm() {
               </div>
             </div>
 
-            {/* Dane urz�dzenia */}
+            {/* Dane urządzenia */}
             <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-              Dane urz�dzenia
+              Dane urządzenia
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -253,7 +253,7 @@ export default function ZgloszenieForm() {
                 className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
                   errors.description ? 'border-red-400' : 'border-gray-300'
                 }`}
-                placeholder="Opisz szczeg�owo usterk�: co si� dzieje, kiedy problem si� pojawi�, w jakich okoliczno�ciach..."
+                placeholder="Opisz szczegółowo usterkę: co się dzieje, kiedy problem się pojawił, w jakich okolicznościach..."
               />
               {errors.description && (
                 <p className="text-red-500 text-xs mt-1">{errors.description}</p>
@@ -265,7 +265,7 @@ export default function ZgloszenieForm() {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-lg transition-colors"
             >
-              {loading ? 'Wysy�anie...' : 'Wy�lij zg�oszenie'}
+              {loading ? 'Wysyłanie...' : 'Wyślij zgłoszenie'}
             </button>
           </form>
         </div>

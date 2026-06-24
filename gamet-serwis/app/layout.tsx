@@ -5,8 +5,8 @@ import './globals.css'
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
-  title: 'Gamet � Serwis Lamp Ostrzegawczych',
-  description: 'Zg�oszenia serwisowe lamp ostrzegawczych Gamet',
+  title: 'Gamet – Serwis Lamp Ostrzegawczych',
+  description: 'Zgłoszenia serwisowe lamp ostrzegawczych Gamet',
 }
 
 export default function RootLayout({

@@ -2,3 +2,5 @@
 !/gamet-serwis/
 !/rescue-serwis/
 !/.gitignore
+
+.vercel

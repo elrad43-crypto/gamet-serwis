@@ -28,32 +28,32 @@ export default async function Potwierdzenie({
           </div>
 
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Zg�oszenie przyj�te!
+            Zgłoszenie przyjęte!
           </h1>
           <p className="text-gray-500 mb-6 text-sm">
-            Dzi�kujemy za przes�anie zg�oszenia serwisowego. Skontaktujemy si� z
-            Tob� w ci�gu 24 godzin.
+            Dziękujemy za przesłanie zgłoszenia serwisowego. Skontaktujemy się z
+            Tobą w ciągu 24 godzin.
           </p>
 
           {nr && (
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-              <p className="text-xs text-gray-500 mb-1">Numer zg�oszenia</p>
+              <p className="text-xs text-gray-500 mb-1">Numer zgłoszenia</p>
               <p className="text-xl font-mono font-bold text-blue-600">{nr}</p>
               <p className="text-xs text-gray-400 mt-1">
-                Zachowaj ten numer � b�dzie potrzebny przy kontakcie z serwisem
+                Zachowaj ten numer – będzie potrzebny przy kontakcie z serwisem
               </p>
             </div>
           )}
 
           <p className="text-sm text-gray-500 mb-6">
-            Potwierdzenie zosta�o wys�ane na Tw�j adres email.
+            Potwierdzenie zostało wysłane na Twój adres email.
           </p>
 
           <Link
             href="/"
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors text-sm"
           >
-            Powr�t do strony g��wnej
+            Powrót do strony głównej
           </Link>
         </div>
       </div>

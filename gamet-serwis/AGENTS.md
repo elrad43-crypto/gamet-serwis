@@ -9,7 +9,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Czym jest projekt
 Strona serwisowa dla firmy gamet-serwis. Klienci wysyłają zgłoszenia serwisowe
 przez formularz; zgłoszenia trafiają do bazy danych. Są konta użytkowników
-i wysyłka e-maili (potwierdzenia). Hosting: GitHub + Netlify.
+i wysyłka e-maili (potwierdzenia). Hosting: GitHub + Vercel.
 
 ## Stos
 - Next.js 16 (App Router, folder `app/`), React 19, TypeScript
@@ -38,7 +38,7 @@ i wysyłka e-maili (potwierdzenia). Hosting: GitHub + Netlify.
 
 ## Kiedy się zatrzymać i zapytać
 - Zadanie wymagałoby zmiany logowania, haseł albo schematu bazy.
-- Trzeba ruszyć ustawienia Netlify albo zmienne środowiskowe na serwerze.
+- Trzeba ruszyć ustawienia Vercela albo zmienne środowiskowe na serwerze.
 - Coś jest niejasne w wymaganiach — pytaj, nie zgaduj.
 
 <!-- ====== DO UZUPEŁNIENIA PRZEZ CIEBIE ====== -->

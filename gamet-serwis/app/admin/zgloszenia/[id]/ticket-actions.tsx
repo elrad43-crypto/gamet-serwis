@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation'
 const STATUSES = [
   { value: 'NEW', label: 'Nowe' },
   { value: 'IN_PROGRESS', label: 'W realizacji' },
-  { value: 'WAITING_FOR_PARTS', label: 'Oczekiwanie na cz�ci' },
-  { value: 'COMPLETED', label: 'Zako�czone' },
-  { value: 'CLOSED', label: 'Zamkni�te' },
+  { value: 'WAITING_FOR_PARTS', label: 'Oczekiwanie na części' },
+  { value: 'COMPLETED', label: 'Zakończone' },
+  { value: 'CLOSED', label: 'Zamknięte' },
 ]
 
 export default function TicketActions({
@@ -36,14 +36,14 @@ export default function TicketActions({
         body: JSON.stringify({ status, note: note.trim() || undefined, isPublic }),
       })
 
-      if (!res.ok) throw new Error('B��d')
+      if (!res.ok) throw new Error('Błąd')
 
       setNote('')
       setSuccess(true)
       router.refresh()
       setTimeout(() => setSuccess(false), 3000)
     } catch {
-      alert('Wyst�pi� b��d podczas zapisywania.')
+      alert('Wystąpił błąd podczas zapisywania.')
     } finally {
       setLoading(false)
     }
@@ -51,11 +51,11 @@ export default function TicketActions({
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="font-semibold text-gray-800 mb-4">Aktualizacja zg�oszenia</h2>
+      <h2 className="font-semibold text-gray-800 mb-4">Aktualizacja zgłoszenia</h2>
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Zmie� status
+          Zmień status
         </label>
         <select
           value={status}
@@ -79,7 +79,7 @@ export default function TicketActions({
           onChange={(e) => setNote(e.target.value)}
           rows={3}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-          placeholder="Dodaj notatk� wewn�trzn� lub informacj� dla klienta..."
+          placeholder="Dodaj notatkę wewnętrzną lub informację dla klienta..."
         />
       </div>
 
@@ -92,13 +92,13 @@ export default function TicketActions({
           className="w-4 h-4 rounded border-gray-300 text-blue-600"
         />
         <label htmlFor="isPublic" className="text-sm text-gray-700">
-          Wy�lij notatk� do klienta emailem
+          Wyślij notatkę do klienta emailem
         </label>
       </div>
 
       {success && (
         <div className="mb-4 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-2">
-          Zg�oszenie zosta�o zaktualizowane.
+          Zgłoszenie zostało zaktualizowane.
         </div>
       )}
 

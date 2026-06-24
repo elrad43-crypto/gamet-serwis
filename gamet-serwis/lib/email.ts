@@ -19,7 +19,7 @@ export async function sendTicketConfirmation(params: {
   lampModel: string
   description: string
 }) {
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: FROM,
     to: params.to,
     subject: `Potwierdzenie zgłoszenia serwisowego #${params.ticketNumber} – Gamet`,
@@ -54,6 +54,7 @@ export async function sendTicketConfirmation(params: {
       </div>
     `,
   })
+  if (error) throw new Error(`Resend: ${error.message}`)
 }
 
 export async function sendStatusUpdate(params: {
@@ -65,7 +66,7 @@ export async function sendStatusUpdate(params: {
 }) {
   const statusLabel = STATUS_LABELS[params.newStatus] || params.newStatus
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: FROM,
     to: params.to,
     subject: `Aktualizacja zgłoszenia #${params.ticketNumber} – ${statusLabel}`,
@@ -86,4 +87,5 @@ export async function sendStatusUpdate(params: {
       </div>
     `,
   })
+  if (error) throw new Error(`Resend: ${error.message}`)
 }

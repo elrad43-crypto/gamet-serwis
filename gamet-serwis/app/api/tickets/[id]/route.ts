@@ -22,7 +22,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
   })
 
   if (!ticket) {
-    return Response.json({ error: 'Nie znaleziono zgłoszenia' }, { status: 404 })
+    return Response.json({ error: 'Nie znaleziono zg�oszenia' }, { status: 404 })
   }
 
   return Response.json({ ticket })
@@ -40,7 +40,7 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
 
   const ticket = await prisma.ticket.findUnique({ where: { id } })
   if (!ticket) {
-    return Response.json({ error: 'Nie znaleziono zgłoszenia' }, { status: 404 })
+    return Response.json({ error: 'Nie znaleziono zg�oszenia' }, { status: 404 })
   }
 
   const updated = await prisma.ticket.update({
@@ -68,7 +68,7 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
         note: isPublic ? note : undefined,
       })
     } catch (emailError) {
-      console.error('Błąd wysyłania emaila o statusie:', emailError)
+      console.error('B��d wysy�ania emaila o statusie:', emailError)
     }
   }
 

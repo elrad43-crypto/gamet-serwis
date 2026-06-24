@@ -1,4 +1,4 @@
-﻿import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import TicketActions from './ticket-actions'
@@ -6,9 +6,9 @@ import TicketActions from './ticket-actions'
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   NEW: { label: 'Nowe', color: 'bg-blue-100 text-blue-700' },
   IN_PROGRESS: { label: 'W realizacji', color: 'bg-yellow-100 text-yellow-700' },
-  WAITING_FOR_PARTS: { label: 'Oczekiwanie na czÄ™Ĺ›ci', color: 'bg-orange-100 text-orange-700' },
-  COMPLETED: { label: 'ZakoĹ„czone', color: 'bg-green-100 text-green-700' },
-  CLOSED: { label: 'ZamkniÄ™te', color: 'bg-gray-100 text-gray-600' },
+  WAITING_FOR_PARTS: { label: 'Oczekiwanie na części', color: 'bg-orange-100 text-orange-700' },
+  COMPLETED: { label: 'Zakończone', color: 'bg-green-100 text-green-700' },
+  CLOSED: { label: 'Zamknięte', color: 'bg-gray-100 text-gray-600' },
 }
 
 export default async function TicketDetailPage({
@@ -37,15 +37,15 @@ export default async function TicketDetailPage({
           href="/admin/zgloszenia"
           className="text-blue-600 hover:underline text-sm"
         >
-          â† PowrĂłt do listy
+          ← Powrót do listy
         </Link>
       </div>
 
-      {/* NagĹ‚Ăłwek */}
+      {/* Nagłówek */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <p className="text-xs text-gray-500 mb-1">Numer zgĹ‚oszenia</p>
+            <p className="text-xs text-gray-500 mb-1">Numer zgłoszenia</p>
             <h1 className="text-2xl font-mono font-bold text-blue-600">
               {ticket.number}
             </h1>
@@ -95,7 +95,7 @@ export default async function TicketDetailPage({
             </div>
           )}
           <div>
-            <span className="text-gray-500">ZgĹ‚oszono:</span>{' '}
+            <span className="text-gray-500">Zgłoszono:</span>{' '}
             <span>{new Date(ticket.createdAt).toLocaleDateString('pl-PL', {
               year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
             })}</span>

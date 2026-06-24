@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     if (!clientName || !clientEmail || !lampModel || !description) {
       return Response.json(
-        { error: 'Brakujące wymagane pola' },
+        { error: 'Brakuj�ce wymagane pola' },
         { status: 400 }
       )
     }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Wyślij email potwierdzający
+    // Wy�lij email potwierdzaj�cy
     try {
       await sendTicketConfirmation({
         to: clientEmail,
@@ -51,13 +51,13 @@ export async function POST(request: NextRequest) {
         description,
       })
     } catch (emailError) {
-      console.error('Błąd wysyłania emaila potwierdzającego:', emailError)
+      console.error('B��d wysy�ania emaila potwierdzaj�cego:', emailError)
     }
 
     return Response.json({ ticket }, { status: 201 })
   } catch (error) {
-    console.error('Błąd tworzenia zgłoszenia:', error)
-    return Response.json({ error: 'Błąd serwera' }, { status: 500 })
+    console.error('B��d tworzenia zg�oszenia:', error)
+    return Response.json({ error: 'B��d serwera' }, { status: 500 })
   }
 }
 

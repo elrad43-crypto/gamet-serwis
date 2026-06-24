@@ -1,4 +1,4 @@
-﻿import NextAuth from 'next-auth'
+import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
@@ -9,7 +9,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       name: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
-        password: { label: 'HasĹ‚o', type: 'password' },
+        password: { label: 'Hasło', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null

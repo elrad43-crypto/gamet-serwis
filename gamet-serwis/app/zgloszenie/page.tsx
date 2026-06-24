@@ -9,6 +9,9 @@ interface FormData {
   clientEmail: string
   clientPhone: string
   companyName: string
+  shippingStreet: string
+  shippingPostalCode: string
+  shippingCity: string
   lampModel: string
   serialNumber: string
   purchaseDate: string
@@ -47,6 +50,9 @@ export default function ZgloszenieForm() {
     clientEmail: '',
     clientPhone: '',
     companyName: '',
+    shippingStreet: '',
+    shippingPostalCode: '',
+    shippingCity: '',
     lampModel: '',
     serialNumber: '',
     purchaseDate: '',
@@ -60,6 +66,8 @@ export default function ZgloszenieForm() {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.clientEmail))
       newErrors.clientEmail = 'Nieprawidłowy adres email'
     if (!form.lampModel) newErrors.lampModel = 'Wybierz model lampy'
+    if (form.shippingPostalCode.trim() && !/^\d{2}-\d{3}$/.test(form.shippingPostalCode.trim()))
+      newErrors.shippingPostalCode = 'Format kodu pocztowego: XX-XXX'
     if (!form.description.trim()) newErrors.description = 'Opis usterki jest wymagany'
     else if (form.description.trim().length < 10)
       newErrors.description = 'Opis musi mieć co najmniej 10 znaków'
@@ -196,6 +204,59 @@ export default function ZgloszenieForm() {
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Nazwa firmy (opcjonalnie)"
+                />
+              </div>
+            </div>
+
+            {/* Adres wysyłki */}
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              Adres wysyłki
+            </h2>
+            <p className="text-gray-500 text-xs mb-4">
+              Wypełnij, jeśli paczka ma trafić do innego odbiorcy niż dane zgłaszającego powyżej
+              (np. zgłoszenie z firmy, wysyłka do klienta). Jeśli pozostawisz puste, paczka
+              wróci na adres zgłaszającego.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ulica i numer</label>
+                <input
+                  type="text"
+                  name="shippingStreet"
+                  value={form.shippingStreet}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="ul. Przykładowa 12/3"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kod pocztowy</label>
+                <input
+                  type="text"
+                  name="shippingPostalCode"
+                  value={form.shippingPostalCode}
+                  onChange={handleChange}
+                  className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.shippingPostalCode ? 'border-red-400' : 'border-gray-300'
+                  }`}
+                  placeholder="00-000"
+                />
+                {errors.shippingPostalCode && (
+                  <p className="text-red-500 text-xs mt-1">{errors.shippingPostalCode}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Miasto</label>
+                <input
+                  type="text"
+                  name="shippingCity"
+                  value={form.shippingCity}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Warszawa"
                 />
               </div>
             </div>

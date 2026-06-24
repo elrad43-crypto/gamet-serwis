@@ -7,21 +7,24 @@ datasource db {
 }
 
 model Ticket {
-  id           String       @id @default(cuid())
-  number       String       @unique
-  clientName   String
-  clientEmail  String
-  clientPhone  String?
-  companyName  String?
-  lampModel    String
-  serialNumber String?
-  purchaseDate String?
-  description  String
-  status       TicketStatus @default(NEW)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  attachments  Attachment[]
-  notes        TicketNote[]
+  id                 String       @id @default(cuid())
+  number             String       @unique
+  clientName         String
+  clientEmail        String
+  clientPhone        String?
+  companyName        String?
+  shippingStreet     String?
+  shippingPostalCode String?
+  shippingCity       String?
+  lampModel          String
+  serialNumber       String?
+  purchaseDate       String?
+  description        String
+  status             TicketStatus @default(NEW)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  attachments        Attachment[]
+  notes              TicketNote[]
 }
 
 model Attachment {

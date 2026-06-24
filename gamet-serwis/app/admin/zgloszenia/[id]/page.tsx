@@ -78,6 +78,16 @@ export default async function TicketDetailPage({
               <span>{ticket.companyName}</span>
             </div>
           )}
+          {(ticket.shippingStreet || ticket.shippingPostalCode || ticket.shippingCity) && (
+            <div className="col-span-2">
+              <span className="text-gray-500">Adres wysyłki:</span>{' '}
+              <span>
+                {[ticket.shippingStreet, [ticket.shippingPostalCode, ticket.shippingCity].filter(Boolean).join(' ')]
+                  .filter(Boolean)
+                  .join(', ')}
+              </span>
+            </div>
+          )}
           <div>
             <span className="text-gray-500">Model lampy:</span>{' '}
             <span className="font-medium">{ticket.lampModel}</span>

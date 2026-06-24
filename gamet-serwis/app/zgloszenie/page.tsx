@@ -23,8 +23,17 @@ const LAMP_MODELS = [
   'Lampa Marta KO',
   'Lampa SLO3LED',
   'Lampa SLO3X',
+  'Makroled 2',
+  'Makroled LL8',
   'Inny model',
 ]
+
+// Numery seryjne Gametu: litery+kod modelu, łamane (/), potem rok i numer.
+// Makroled 2: AX06/2600000 -> AX06 / 26 (rok 2026) 00000 (numer).
+const SERIAL_NUMBER_HINTS: Record<string, string> = {
+  'Makroled 2': 'np. AX06/2600000 (kod/rok+numer)',
+}
+const DEFAULT_SERIAL_HINT = 'np. SN-2023-00123'
 
 export default function ZgloszenieForm() {
   const router = useRouter()
@@ -219,7 +228,7 @@ export default function ZgloszenieForm() {
                   value={form.serialNumber}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="np. SN-2023-00123"
+                  placeholder={SERIAL_NUMBER_HINTS[form.lampModel] ?? DEFAULT_SERIAL_HINT}
                 />
               </div>
 

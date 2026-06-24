@@ -16,12 +16,13 @@ interface FormData {
 }
 
 const LAMP_MODELS = [
-  'GL-100 LED',
-  'GL-200 LED',
-  'GL-300 Stroboskop',
-  'GL-400 Xenon',
-  'GL-500 Magnetyczna',
-  'GL-600 Solarna',
+  'Orion A',
+  'Orion B',
+  'Belka LED N DeLUX',
+  'Belka mini X',
+  'Lampa Marta KO',
+  'Lampa SLO3LED',
+  'Lampa SLO3X',
   'Inny model',
 ]
 

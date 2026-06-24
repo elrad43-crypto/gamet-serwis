@@ -28,10 +28,13 @@ const LAMP_MODELS = [
   'Inny model',
 ]
 
-// Numery seryjne Gametu: litery+kod modelu, łamane (/), potem rok i numer.
-// Makroled 2: AX06/2600000 -> AX06 / 26 (rok 2026) 00000 (numer).
+// Numery seryjne Gametu: stały prefiks (kod modelu + "/"), potem rok i numer.
+// Makroled 2: AX06/2600000 -> prefiks "AX06/" + 2600000 (rok 26 + numer 00000).
+const SERIAL_NUMBER_PREFIXES: Record<string, string> = {
+  'Makroled 2': 'AX06/',
+}
 const SERIAL_NUMBER_HINTS: Record<string, string> = {
-  'Makroled 2': 'np. AX06/2600000 (kod/rok+numer)',
+  'Makroled 2': 'np. 2600000 (rok+numer)',
 }
 const DEFAULT_SERIAL_HINT = 'np. SN-2023-00123'
 
@@ -91,10 +94,19 @@ export default function ZgloszenieForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
+    if (name === 'lampModel') {
+      setForm((prev) => ({ ...prev, lampModel: value, serialNumber: SERIAL_NUMBER_PREFIXES[value] ?? '' }))
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }))
+    }
     if (errors[name as keyof FormData]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }))
     }
+  }
+
+  function handleSerialSuffixChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const prefix = SERIAL_NUMBER_PREFIXES[form.lampModel] ?? ''
+    setForm((prev) => ({ ...prev, serialNumber: prefix + e.target.value }))
   }
 
   return (
@@ -222,14 +234,30 @@ export default function ZgloszenieForm() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Numer seryjny
                 </label>
-                <input
-                  type="text"
-                  name="serialNumber"
-                  value={form.serialNumber}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder={SERIAL_NUMBER_HINTS[form.lampModel] ?? DEFAULT_SERIAL_HINT}
-                />
+                {SERIAL_NUMBER_PREFIXES[form.lampModel] ? (
+                  <div className="flex w-full border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
+                    <span className="flex items-center bg-gray-100 text-gray-600 text-sm px-3 font-mono">
+                      {SERIAL_NUMBER_PREFIXES[form.lampModel]}
+                    </span>
+                    <input
+                      type="text"
+                      name="serialNumber"
+                      value={form.serialNumber.slice(SERIAL_NUMBER_PREFIXES[form.lampModel].length)}
+                      onChange={handleSerialSuffixChange}
+                      className="flex-1 min-w-0 px-3 py-2 text-sm focus:outline-none"
+                      placeholder={SERIAL_NUMBER_HINTS[form.lampModel] ?? DEFAULT_SERIAL_HINT}
+                    />
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    name="serialNumber"
+                    value={form.serialNumber}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={SERIAL_NUMBER_HINTS[form.lampModel] ?? DEFAULT_SERIAL_HINT}
+                  />
+                )}
               </div>
 
               <div className="sm:col-span-2">

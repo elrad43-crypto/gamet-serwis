@@ -1,12 +1,12 @@
-import { prisma } from '@/lib/prisma'
+﻿import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   NEW: { label: 'Nowe', color: 'bg-blue-100 text-blue-700' },
   IN_PROGRESS: { label: 'W realizacji', color: 'bg-yellow-100 text-yellow-700' },
-  WAITING_FOR_PARTS: { label: 'Oczekiwanie na części', color: 'bg-orange-100 text-orange-700' },
-  COMPLETED: { label: 'Zakończone', color: 'bg-green-100 text-green-700' },
-  CLOSED: { label: 'Zamknięte', color: 'bg-gray-100 text-gray-600' },
+  WAITING_FOR_PARTS: { label: 'Oczekiwanie na czÄ™Ĺ›ci', color: 'bg-orange-100 text-orange-700' },
+  COMPLETED: { label: 'ZakoĹ„czone', color: 'bg-green-100 text-green-700' },
+  CLOSED: { label: 'ZamkniÄ™te', color: 'bg-gray-100 text-gray-600' },
 }
 
 export default async function ZgloszeniaPage({
@@ -44,12 +44,12 @@ export default async function ZgloszeniaPage({
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-900">
-          Zgłoszenia serwisowe
+          ZgĹ‚oszenia serwisowe
           <span className="ml-2 text-sm font-normal text-gray-500">
-            ({tickets.length} wyników)
+            ({tickets.length} wynikĂłw)
           </span>
         </h1>
-        <span className="text-sm text-gray-500">Łącznie: {total}</span>
+        <span className="text-sm text-gray-500">ĹÄ…cznie: {total}</span>
       </div>
 
       {/* Filtry statusu */}
@@ -94,10 +94,10 @@ export default async function ZgloszeniaPage({
         />
       </form>
 
-      {/* Lista zgłoszeń */}
+      {/* Lista zgĹ‚oszeĹ„ */}
       {tickets.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-500">
-          Brak zgłoszeń
+          Brak zgĹ‚oszeĹ„
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -113,7 +113,7 @@ export default async function ZgloszeniaPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {tickets.map((ticket) => {
+              {tickets.map((ticket: (typeof tickets)[number]) => {
                 const s = STATUS_LABELS[ticket.status] || { label: ticket.status, color: 'bg-gray-100 text-gray-600' }
                 return (
                   <tr key={ticket.id} className="hover:bg-gray-50 transition-colors" data-id={ticket.id}>
@@ -138,7 +138,7 @@ export default async function ZgloszeniaPage({
                         href={`/admin/zgloszenia/${ticket.id}`}
                         className="text-blue-600 hover:underline text-xs font-medium"
                       >
-                        Szczegóły →
+                        SzczegĂłĹ‚y â†’
                       </Link>
                     </td>
                   </tr>

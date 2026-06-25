@@ -32,8 +32,8 @@ export async function sendTicketConfirmation(params: {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #1a1a1a;">Zgłoszenie serwisowe przyjęte</h2>
-        <p>Dzień dobry ${params.clientName},</p>
-        <p>Twoje zgłoszenie serwisowe zostało przyjęte. Poniżej znajdziesz podsumowanie:</p>
+        <p>Dzień dobry,</p>
+        <p>dziękujemy, że zwrócili się Państwo do PW GAMET. Każde zgłoszenie traktujemy poważnie i z należytą starannością — Państwa sprawa została przyjęta i już się nią zajmujemy. Oto jej szczegóły:</p>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr style="background: #f5f5f5;">
             <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Numer zgłoszenia</td>

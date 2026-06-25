@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { LAMP_TYPES, LAMP_CATEGORIES, OTHER_LAMP_MODEL } from '@/lib/lamp-types'
+import { OTHER_LAMP_MODEL } from '@/lib/lamp-types'
+import LampModelPicker, { type LampSelection } from '@/components/LampModelPicker'
 
 interface FormData {
   clientName: string
@@ -20,11 +21,6 @@ interface FormData {
   purchaseDate: string
   description: string
 }
-
-const OTHER_OPTION_VALUE = 'OTHER'
-
-const DEFAULT_SERIAL_HINT = 'np. SN-2023-00123'
-const CATALOG_SERIAL_HINT = 'np. 2600000 (rok+numer)'
 
 export default function ZgloszenieForm() {
   const router = useRouter()
@@ -113,36 +109,12 @@ export default function ZgloszenieForm() {
     }
   }
 
-  function handleLampModelChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value
-    if (value === OTHER_OPTION_VALUE) {
-      setForm((prev) => ({
-        ...prev,
-        lampModel: OTHER_LAMP_MODEL,
-        lampGroupCode: '',
-        serialNumber: '',
-      }))
-    } else {
-      const lampType = LAMP_TYPES.find((t) => t.groupCode === value)
-      setForm((prev) => ({
-        ...prev,
-        lampModel: lampType?.name ?? '',
-        lampGroupCode: value,
-        serialNumber: value ? `${value}/` : '',
-      }))
-    }
+  function handleLampChange(next: LampSelection) {
+    setForm((prev) => ({ ...prev, ...next }))
     if (errors.lampModel) {
       setErrors((prev) => ({ ...prev, lampModel: undefined }))
     }
   }
-
-  function handleSerialSuffixChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const prefix = `${form.lampGroupCode}/`
-    setForm((prev) => ({ ...prev, serialNumber: prefix + e.target.value }))
-  }
-
-  const selectedValue =
-    form.lampModel === OTHER_LAMP_MODEL ? OTHER_OPTION_VALUE : form.lampGroupCode
 
   return (
     <main className="min-h-screen bg-gray-50 py-12 px-4">
@@ -294,80 +266,16 @@ export default function ZgloszenieForm() {
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Model lampy <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="lampModel"
-                  value={selectedValue}
-                  onChange={handleLampModelChange}
-                  className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
-                    errors.lampModel ? 'border-red-400' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Wybierz model...</option>
-                  {LAMP_CATEGORIES.map((category) => (
-                    <optgroup key={category} label={category}>
-                      {LAMP_TYPES.filter((t) => t.category === category).map((t) => (
-                        <option key={t.groupCode} value={t.groupCode}>
-                          {t.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                  <option value={OTHER_OPTION_VALUE}>{OTHER_LAMP_MODEL}</option>
-                </select>
-                {errors.lampModel && (
-                  <p className="text-red-500 text-xs mt-1">{errors.lampModel}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Numer seryjny
-                </label>
-                {form.lampGroupCode ? (
-                  <div className="flex w-full border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
-                    <span className="flex items-center bg-gray-100 text-gray-600 text-sm px-3 font-mono">
-                      {form.lampGroupCode}/
-                    </span>
-                    <input
-                      type="text"
-                      name="serialNumber"
-                      value={form.serialNumber.slice(form.lampGroupCode.length + 1)}
-                      onChange={handleSerialSuffixChange}
-                      className="flex-1 min-w-0 px-3 py-2 text-sm focus:outline-none"
-                      placeholder={CATALOG_SERIAL_HINT}
-                    />
-                  </div>
-                ) : (
-                  <input
-                    type="text"
-                    name="serialNumber"
-                    value={form.serialNumber}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder={DEFAULT_SERIAL_HINT}
-                  />
-                )}
-              </div>
-
-              {form.lampModel === OTHER_LAMP_MODEL && (
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nazwa modelu (jeśli znana)
-                  </label>
-                  <input
-                    type="text"
-                    name="otherModelText"
-                    value={form.otherModelText}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Np. nazwa z tabliczki znamionowej"
-                  />
-                </div>
-              )}
+              <LampModelPicker
+                value={{
+                  lampModel: form.lampModel,
+                  lampGroupCode: form.lampGroupCode,
+                  serialNumber: form.serialNumber,
+                  otherModelText: form.otherModelText,
+                }}
+                onChange={handleLampChange}
+                error={errors.lampModel}
+              />
 
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">

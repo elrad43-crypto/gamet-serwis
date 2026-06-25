@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { LAMP_TYPES, OTHER_LAMP_MODEL } from '@/lib/lamp-types'
+import { LAMP_TYPES, LAMP_CATEGORIES, OTHER_LAMP_MODEL } from '@/lib/lamp-types'
 
 interface FormData {
   clientName: string
@@ -22,9 +22,6 @@ interface FormData {
 }
 
 const OTHER_OPTION_VALUE = 'OTHER'
-
-// Kategorie w kolejnosci wystepowania w katalogu (lib/lamp-types.ts)
-const CATEGORIES = Array.from(new Set(LAMP_TYPES.map((t) => t.category)))
 
 const DEFAULT_SERIAL_HINT = 'np. SN-2023-00123'
 const CATALOG_SERIAL_HINT = 'np. 2600000 (rok+numer)'
@@ -310,7 +307,7 @@ export default function ZgloszenieForm() {
                   }`}
                 >
                   <option value="">Wybierz model...</option>
-                  {CATEGORIES.map((category) => (
+                  {LAMP_CATEGORIES.map((category) => (
                     <optgroup key={category} label={category}>
                       {LAMP_TYPES.filter((t) => t.category === category).map((t) => (
                         <option key={t.groupCode} value={t.groupCode}>

@@ -115,3 +115,11 @@ export const LAMP_TYPES: LampType[] = [
 export function getLampType(groupCode: string): LampType | undefined {
   return LAMP_TYPES.find((t) => t.groupCode === groupCode)
 }
+
+export function getLampCategory(groupCode?: string | null): string | null {
+  if (!groupCode) return null
+  return getLampType(groupCode)?.category ?? null
+}
+
+// Kategorie w kolejnosci wystepowania w katalogu
+export const LAMP_CATEGORIES = Array.from(new Set(LAMP_TYPES.map((t) => t.category)))

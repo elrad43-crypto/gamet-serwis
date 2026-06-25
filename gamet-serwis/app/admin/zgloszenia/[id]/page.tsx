@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import TicketActions from './ticket-actions'
+import { getLampCategory } from '@/lib/lamp-types'
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   NEW: { label: 'Nowe', color: 'bg-blue-100 text-blue-700' },
@@ -29,6 +30,7 @@ export default async function TicketDetailPage({
   if (!ticket) notFound()
 
   const s = STATUS_LABELS[ticket.status] || { label: ticket.status, color: 'bg-gray-100 text-gray-600' }
+  const lampCategory = getLampCategory(ticket.lampGroupCode)
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -92,6 +94,12 @@ export default async function TicketDetailPage({
             <span className="text-gray-500">Model lampy:</span>{' '}
             <span className="font-medium">{ticket.lampModel}</span>
           </div>
+          {lampCategory && (
+            <div>
+              <span className="text-gray-500">Kategoria:</span>{' '}
+              <span>{lampCategory} ({ticket.lampGroupCode})</span>
+            </div>
+          )}
           {ticket.serialNumber && (
             <div>
               <span className="text-gray-500">Nr seryjny:</span>{' '}

@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { TicketStatus } from '@prisma/client'
 import Link from 'next/link'
+import { LAMP_CATEGORIES, LAMP_TYPES, getLampCategory } from '@/lib/lamp-types'
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   NEW: { label: 'Nowe', color: 'bg-blue-100 text-blue-700' },
@@ -13,13 +14,18 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 export default async function ZgloszeniaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; q?: string }>
+  searchParams: Promise<{ status?: string; q?: string; category?: string }>
 }) {
-  const { status, q } = await searchParams
+  const { status, q, category } = await searchParams
+
+  const categoryGroupCodes = category
+    ? LAMP_TYPES.filter((t) => t.category === category).map((t) => t.groupCode)
+    : null
 
   const tickets = await prisma.ticket.findMany({
     where: {
       ...(status ? { status: status as TicketStatus } : {}),
+      ...(categoryGroupCodes ? { lampGroupCode: { in: categoryGroupCodes } } : {}),
       ...(q
         ? {
             OR: [
@@ -41,6 +47,15 @@ export default async function ZgloszeniaPage({
 
   const total = counts.reduce((sum: number, c: typeof counts[number]) => sum + c._count.status, 0)
 
+  function statusLinkHref(statusKey?: string) {
+    const sp = new URLSearchParams()
+    if (statusKey) sp.set('status', statusKey)
+    if (category) sp.set('category', category)
+    if (q) sp.set('q', q)
+    const s = sp.toString()
+    return `/admin/zgloszenia${s ? `?${s}` : ''}`
+  }
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -56,7 +71,7 @@ export default async function ZgloszeniaPage({
       {/* Filtry statusu */}
       <div className="flex gap-2 flex-wrap mb-4">
         <Link
-          href="/admin/zgloszenia"
+          href={statusLinkHref()}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
             !status
               ? 'bg-blue-600 text-white'
@@ -70,7 +85,7 @@ export default async function ZgloszeniaPage({
           return (
             <Link
               key={key}
-              href={`/admin/zgloszenia?status=${key}`}
+              href={statusLinkHref(key)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                 status === key
                   ? 'bg-blue-600 text-white'
@@ -83,16 +98,34 @@ export default async function ZgloszeniaPage({
         })}
       </div>
 
-      {/* Wyszukiwarka */}
-      <form className="mb-6">
+      {/* Wyszukiwarka i filtr kategorii */}
+      <form className="flex flex-col sm:flex-row gap-2 mb-6">
         {status && <input type="hidden" name="status" value={status} />}
         <input
           type="text"
           name="q"
           defaultValue={q}
           placeholder="Szukaj po numerze, nazwisku, emailu lub modelu..."
-          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         />
+        <select
+          name="category"
+          defaultValue={category ?? ''}
+          className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          <option value="">Wszystkie kategorie</option>
+          {LAMP_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <button
+          type="submit"
+          className="px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+        >
+          Filtruj
+        </button>
       </form>
 
       {/* Lista zgłoszeń */}
@@ -108,6 +141,7 @@ export default async function ZgloszeniaPage({
                 <th className="text-left px-4 py-3 font-medium text-gray-600">Numer</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">Klient</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">Model lampy</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">Kategoria</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">Data</th>
                 <th className="px-4 py-3"></th>
@@ -126,6 +160,9 @@ export default async function ZgloszeniaPage({
                       <div className="text-gray-500 text-xs">{ticket.clientEmail}</div>
                     </td>
                     <td className="px-4 py-3 text-gray-700">{ticket.lampModel}</td>
+                    <td className="px-4 py-3 text-gray-500 text-xs">
+                      {getLampCategory(ticket.lampGroupCode) ?? '—'}
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.color}`}>
                         {s.label}

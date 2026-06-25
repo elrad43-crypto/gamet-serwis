@@ -4,6 +4,9 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 const FROM = process.env.RESEND_FROM_EMAIL || 'serwis@gamet.pl'
 
+// Sandbox Resend: onboarding@resend.dev może wysyłać tylko na adres właściciela konta
+const SERVICE_NOTIFICATION_EMAIL = 'elrad43@gmail.com'
+
 const STATUS_LABELS: Record<string, string> = {
   NEW: 'Nowe',
   IN_PROGRESS: 'W realizacji',
@@ -51,6 +54,62 @@ export async function sendTicketConfirmation(params: {
           Gamet – Producent Lamp Ostrzegawczych<br>
           Ten email został wygenerowany automatycznie.
         </p>
+      </div>
+    `,
+  })
+  if (error) throw new Error(`Resend: ${error.message}`)
+}
+
+export async function sendInternalTicketNotification(params: {
+  ticketNumber: string
+  clientName: string
+  clientEmail: string
+  clientPhone?: string | null
+  companyName?: string | null
+  shippingStreet?: string | null
+  shippingPostalCode?: string | null
+  shippingCity?: string | null
+  lampModel: string
+  serialNumber?: string | null
+  description: string
+}) {
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: SERVICE_NOTIFICATION_EMAIL,
+    subject: `Nowe zgłoszenie serwisowe #${params.ticketNumber}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1a1a1a;">Nowe zgłoszenie serwisowe</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          <tr style="background: #f5f5f5;">
+            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Numer zgłoszenia</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>${params.ticketNumber}</strong></td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Klient</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">${params.clientName}${params.companyName ? ` (${params.companyName})` : ''}</td>
+          </tr>
+          <tr style="background: #f5f5f5;">
+            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Kontakt</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">${params.clientEmail}${params.clientPhone ? `, ${params.clientPhone}` : ''}</td>
+          </tr>
+          ${
+            params.shippingStreet || params.shippingPostalCode || params.shippingCity
+              ? `<tr>
+            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Adres wysyłki</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">${[params.shippingStreet, params.shippingPostalCode, params.shippingCity].filter(Boolean).join(', ')}</td>
+          </tr>`
+              : ''
+          }
+          <tr style="background: #f5f5f5;">
+            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Model lampy</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">${params.lampModel}${params.serialNumber ? ` (nr seryjny: ${params.serialNumber})` : ''}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Opis usterki</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">${params.description}</td>
+          </tr>
+        </table>
       </div>
     `,
   })

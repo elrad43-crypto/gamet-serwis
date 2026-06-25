@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { TicketStatus } from '@prisma/client'
 import Link from 'next/link'
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -18,7 +19,7 @@ export default async function ZgloszeniaPage({
 
   const tickets = await prisma.ticket.findMany({
     where: {
-      ...(status ? { status: status as any } : {}),
+      ...(status ? { status: status as TicketStatus } : {}),
       ...(q
         ? {
             OR: [
@@ -64,7 +65,7 @@ export default async function ZgloszeniaPage({
         >
           Wszystkie ({total})
         </Link>
-        {Object.entries(STATUS_LABELS).map(([key, { label, color }]) => {
+        {Object.entries(STATUS_LABELS).map(([key, { label }]) => {
           const count = counts.find((c: typeof counts[number]) => c.status === key)?._count.status ?? 0
           return (
             <Link

@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { generateTicketNumber } from '@/lib/ticket-number'
-import { sendTicketConfirmation } from '@/lib/email'
+import { sendTicketConfirmation, sendInternalTicketNotification } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Wyślij email potwierdzający
+    // Wyślij email potwierdzający do klienta
     try {
       await sendTicketConfirmation({
         to: clientEmail,
@@ -58,6 +58,25 @@ export async function POST(request: NextRequest) {
       })
     } catch (emailError) {
       console.error('Błąd wysyłania emaila potwierdzającego:', emailError)
+    }
+
+    // Wyślij powiadomienie do serwisu
+    try {
+      await sendInternalTicketNotification({
+        ticketNumber: number,
+        clientName,
+        clientEmail,
+        clientPhone,
+        companyName,
+        shippingStreet,
+        shippingPostalCode,
+        shippingCity,
+        lampModel,
+        serialNumber,
+        description,
+      })
+    } catch (emailError) {
+      console.error('Błąd wysyłania powiadomienia do serwisu:', emailError)
     }
 
     return Response.json({ ticket }, { status: 201 })

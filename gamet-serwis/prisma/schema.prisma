@@ -17,6 +17,7 @@ model Ticket {
   shippingPostalCode String?
   shippingCity       String?
   lampModel          String
+  lampGroupCode      String?
   serialNumber       String?
   purchaseDate       String?
   description        String

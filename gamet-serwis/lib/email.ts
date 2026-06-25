@@ -78,10 +78,33 @@ export async function sendInternalTicketNotification(params: {
   description: string
 }) {
   const lampCategory = getLampCategory(params.lampGroupCode)
+  const shippingAddress = [
+    params.shippingStreet,
+    [params.shippingPostalCode, params.shippingCity].filter(Boolean).join(' '),
+  ]
+    .filter(Boolean)
+    .join(', ')
+  const modelLine = `${params.lampModel}${lampCategory ? ` (${lampCategory})` : ''}${params.serialNumber ? ` (nr seryjny: ${params.serialNumber})` : ''}`
+
+  const textRows: [string, string][] = [
+    ['Klient', `${params.clientName}${params.companyName ? ` (${params.companyName})` : ''}`],
+    ['Kontakt', `${params.clientEmail}${params.clientPhone ? `, ${params.clientPhone}` : ''}`],
+    ...(shippingAddress ? ([['Adres wysyłki', shippingAddress]] as [string, string][]) : []),
+    ['Model', modelLine],
+    ['Usterka', params.description],
+  ]
+  const labelWidth = Math.max(...textRows.map(([label]) => label.length + 1)) + 1
+  const text = [
+    `NOWE ZGŁOSZENIE — ${params.ticketNumber}`,
+    '',
+    ...textRows.map(([label, value]) => `${`${label}:`.padEnd(labelWidth)}${value}`),
+  ].join('\n')
+
   const { error } = await resend.emails.send({
     from: FROM,
     to: SERVICE_NOTIFICATION_EMAIL,
     subject: `Nowe zgłoszenie serwisowe #${params.ticketNumber}`,
+    text,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #1a1a1a;">Nowe zgłoszenie serwisowe</h2>

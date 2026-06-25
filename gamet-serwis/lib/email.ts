@@ -95,6 +95,10 @@ export async function sendInternalTicketNotification(params: {
   ]
   const labelWidth = Math.max(...textRows.map(([label]) => label.length + 1)) + 1
   const text = [
+    'Dzień dobry,',
+    '',
+    'W systemie zostało zarejestrowane nowe zgłoszenie serwisowe. Szczegóły poniżej:',
+    '',
     `NOWE ZGŁOSZENIE — ${params.ticketNumber}`,
     '',
     ...textRows.map(([label, value]) => `${`${label}:`.padEnd(labelWidth)}${value}`),
@@ -108,6 +112,8 @@ export async function sendInternalTicketNotification(params: {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #1a1a1a;">Nowe zgłoszenie serwisowe</h2>
+        <p>Dzień dobry,</p>
+        <p>W systemie zostało zarejestrowane nowe zgłoszenie serwisowe. Szczegóły poniżej:</p>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr style="background: #f5f5f5;">
             <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Numer zgłoszenia</td>

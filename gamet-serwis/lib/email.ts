@@ -97,7 +97,7 @@ export async function sendInternalTicketNotification(params: {
   const text = [
     'Dzień dobry,',
     '',
-    'W systemie zostało zarejestrowane nowe zgłoszenie serwisowe. Szczegóły poniżej:',
+    'dziękujemy, że zwrócili się Państwo do PW GAMET. Każde zgłoszenie traktujemy poważnie i z należytą starannością — Państwa sprawa została przyjęta i już się nią zajmujemy. Oto jej szczegóły:',
     '',
     `NOWE ZGŁOSZENIE — ${params.ticketNumber}`,
     '',
@@ -113,7 +113,7 @@ export async function sendInternalTicketNotification(params: {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #1a1a1a;">Nowe zgłoszenie serwisowe</h2>
         <p>Dzień dobry,</p>
-        <p>W systemie zostało zarejestrowane nowe zgłoszenie serwisowe. Szczegóły poniżej:</p>
+        <p>dziękujemy, że zwrócili się Państwo do PW GAMET. Każde zgłoszenie traktujemy poważnie i z należytą starannością — Państwa sprawa została przyjęta i już się nią zajmujemy. Oto jej szczegóły:</p>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr style="background: #f5f5f5;">
             <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Numer zgłoszenia</td>

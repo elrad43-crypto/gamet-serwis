@@ -5,6 +5,8 @@ export interface LampType {
   category: string
 }
 
+export const OTHER_LAMP_MODEL = 'Inny / nie wiem'
+
 export const LAMP_TYPES: LampType[] = [
   { name: 'FALA 6 MAKROLED', groupCode: 'AA01', category: 'INNE' },
   { name: 'FALA 8 MAKROLED', groupCode: 'AA02', category: 'INNE' },

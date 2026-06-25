@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { generateTicketNumber } from '@/lib/ticket-number'
 import { sendTicketConfirmation, sendInternalTicketNotification } from '@/lib/email'
+import { lampSelectionSchema } from '@/lib/validators/ticket'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,6 +17,7 @@ export async function POST(request: NextRequest) {
       shippingPostalCode,
       shippingCity,
       lampModel,
+      lampGroupCode,
       serialNumber,
       purchaseDate,
       description,
@@ -24,6 +26,14 @@ export async function POST(request: NextRequest) {
     if (!clientName || !clientEmail || !lampModel || !description) {
       return Response.json(
         { error: 'Brakujące wymagane pola' },
+        { status: 400 }
+      )
+    }
+
+    const lampSelection = lampSelectionSchema.safeParse({ lampModel, lampGroupCode })
+    if (!lampSelection.success) {
+      return Response.json(
+        { error: lampSelection.error.issues[0]?.message ?? 'Nieprawidłowy model lampy' },
         { status: 400 }
       )
     }
@@ -41,6 +51,7 @@ export async function POST(request: NextRequest) {
         shippingPostalCode: shippingPostalCode || null,
         shippingCity: shippingCity || null,
         lampModel,
+        lampGroupCode: lampGroupCode || null,
         serialNumber: serialNumber || null,
         purchaseDate: purchaseDate || null,
         description,

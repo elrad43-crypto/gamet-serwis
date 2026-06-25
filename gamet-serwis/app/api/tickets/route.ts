@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
         clientName,
         ticketNumber: number,
         lampModel,
+        lampGroupCode,
         description,
       })
     } catch (emailError) {
@@ -83,6 +84,7 @@ export async function POST(request: NextRequest) {
         shippingPostalCode,
         shippingCity,
         lampModel,
+        lampGroupCode,
         serialNumber,
         description,
       })

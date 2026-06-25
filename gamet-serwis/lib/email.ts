@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { getLampCategory } from '@/lib/lamp-types'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -20,8 +21,10 @@ export async function sendTicketConfirmation(params: {
   clientName: string
   ticketNumber: string
   lampModel: string
+  lampGroupCode?: string | null
   description: string
 }) {
+  const lampCategory = getLampCategory(params.lampGroupCode)
   const { error } = await resend.emails.send({
     from: FROM,
     to: params.to,
@@ -38,7 +41,7 @@ export async function sendTicketConfirmation(params: {
           </tr>
           <tr>
             <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Model lampy</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${params.lampModel}</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">${params.lampModel}${lampCategory ? ` (${lampCategory})` : ''}</td>
           </tr>
           <tr style="background: #f5f5f5;">
             <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Opis usterki</td>
@@ -70,9 +73,11 @@ export async function sendInternalTicketNotification(params: {
   shippingPostalCode?: string | null
   shippingCity?: string | null
   lampModel: string
+  lampGroupCode?: string | null
   serialNumber?: string | null
   description: string
 }) {
+  const lampCategory = getLampCategory(params.lampGroupCode)
   const { error } = await resend.emails.send({
     from: FROM,
     to: SERVICE_NOTIFICATION_EMAIL,
@@ -103,7 +108,7 @@ export async function sendInternalTicketNotification(params: {
           }
           <tr style="background: #f5f5f5;">
             <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Model lampy</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${params.lampModel}${params.serialNumber ? ` (nr seryjny: ${params.serialNumber})` : ''}</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">${params.lampModel}${lampCategory ? ` (${lampCategory})` : ''}${params.serialNumber ? ` (nr seryjny: ${params.serialNumber})` : ''}</td>
           </tr>
           <tr>
             <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Opis usterki</td>

@@ -90,8 +90,8 @@ export async function sendInternalTicketNotification(params: {
     ['Klient', `${params.clientName}${params.companyName ? ` (${params.companyName})` : ''}`],
     ['Kontakt', `${params.clientEmail}${params.clientPhone ? `, ${params.clientPhone}` : ''}`],
     ...(shippingAddress ? ([['Adres wysyłki', shippingAddress]] as [string, string][]) : []),
-    ['Model', modelLine],
-    ['Usterka', params.description],
+    ['Model lampy', modelLine],
+    ['Opis usterki', params.description],
   ]
   const labelWidth = Math.max(...textRows.map(([label]) => label.length + 1)) + 1
   const text = [

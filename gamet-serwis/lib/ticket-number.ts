@@ -1,7 +1,8 @@
-export function generateTicketNumber(): string {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const random = Math.floor(Math.random() * 9000) + 1000
-  return `GAM-${year}${month}-${random}`
+import { prisma } from '@/lib/prisma'
+
+export async function generateTicketNumber(): Promise<string> {
+  const result = await prisma.$queryRaw<{ value: bigint }[]>`SELECT nextval('ticket_number_seq') AS value`
+  const seq = result[0].value
+  const year = new Date().getFullYear()
+  return `SRW/${String(seq).padStart(5, '0')}/${year}`
 }

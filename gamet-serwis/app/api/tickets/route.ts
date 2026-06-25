@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const number = generateTicketNumber()
+    const number = await generateTicketNumber()
 
     const ticket = await prisma.ticket.create({
       data: {

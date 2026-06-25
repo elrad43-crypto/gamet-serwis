@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { LAMP_TYPES, OTHER_LAMP_MODEL } from '@/lib/lamp-types'
 
 interface FormData {
   clientName: string
@@ -13,33 +14,20 @@ interface FormData {
   shippingPostalCode: string
   shippingCity: string
   lampModel: string
+  lampGroupCode: string
+  otherModelText: string
   serialNumber: string
   purchaseDate: string
   description: string
 }
 
-const LAMP_MODELS = [
-  'Orion A',
-  'Orion B',
-  'Belka LED N DeLUX',
-  'Belka mini X',
-  'Lampa Marta KO',
-  'Lampa SLO3LED',
-  'Lampa SLO3X',
-  'Makroled 2',
-  'Makroled LL8',
-  'Inny model',
-]
+const OTHER_OPTION_VALUE = 'OTHER'
 
-// Numery seryjne Gametu: stały prefiks (kod modelu + "/"), potem rok i numer.
-// Makroled 2: AX06/2600000 -> prefiks "AX06/" + 2600000 (rok 26 + numer 00000).
-const SERIAL_NUMBER_PREFIXES: Record<string, string> = {
-  'Makroled 2': 'AX06/',
-}
-const SERIAL_NUMBER_HINTS: Record<string, string> = {
-  'Makroled 2': 'np. 2600000 (rok+numer)',
-}
+// Kategorie w kolejnosci wystepowania w katalogu (lib/lamp-types.ts)
+const CATEGORIES = Array.from(new Set(LAMP_TYPES.map((t) => t.category)))
+
 const DEFAULT_SERIAL_HINT = 'np. SN-2023-00123'
+const CATALOG_SERIAL_HINT = 'np. 2600000 (rok+numer)'
 
 export default function ZgloszenieForm() {
   const router = useRouter()
@@ -54,6 +42,8 @@ export default function ZgloszenieForm() {
     shippingPostalCode: '',
     shippingCity: '',
     lampModel: '',
+    lampGroupCode: '',
+    otherModelText: '',
     serialNumber: '',
     purchaseDate: '',
     description: '',
@@ -81,10 +71,28 @@ export default function ZgloszenieForm() {
 
     setLoading(true)
     try {
+      const description =
+        form.lampModel === OTHER_LAMP_MODEL && form.otherModelText.trim()
+          ? `Model: ${form.otherModelText.trim()}\n\n${form.description}`
+          : form.description
+
       const res = await fetch('/api/tickets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          clientName: form.clientName,
+          clientEmail: form.clientEmail,
+          clientPhone: form.clientPhone,
+          companyName: form.companyName,
+          shippingStreet: form.shippingStreet,
+          shippingPostalCode: form.shippingPostalCode,
+          shippingCity: form.shippingCity,
+          lampModel: form.lampModel,
+          lampGroupCode: form.lampGroupCode,
+          serialNumber: form.serialNumber,
+          purchaseDate: form.purchaseDate,
+          description,
+        }),
       })
 
       if (!res.ok) throw new Error('Błąd serwera')
@@ -102,20 +110,42 @@ export default function ZgloszenieForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target
-    if (name === 'lampModel') {
-      setForm((prev) => ({ ...prev, lampModel: value, serialNumber: SERIAL_NUMBER_PREFIXES[value] ?? '' }))
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value }))
-    }
+    setForm((prev) => ({ ...prev, [name]: value }))
     if (errors[name as keyof FormData]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }))
     }
   }
 
+  function handleLampModelChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value
+    if (value === OTHER_OPTION_VALUE) {
+      setForm((prev) => ({
+        ...prev,
+        lampModel: OTHER_LAMP_MODEL,
+        lampGroupCode: '',
+        serialNumber: '',
+      }))
+    } else {
+      const lampType = LAMP_TYPES.find((t) => t.groupCode === value)
+      setForm((prev) => ({
+        ...prev,
+        lampModel: lampType?.name ?? '',
+        lampGroupCode: value,
+        serialNumber: value ? `${value}/` : '',
+      }))
+    }
+    if (errors.lampModel) {
+      setErrors((prev) => ({ ...prev, lampModel: undefined }))
+    }
+  }
+
   function handleSerialSuffixChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const prefix = SERIAL_NUMBER_PREFIXES[form.lampModel] ?? ''
+    const prefix = `${form.lampGroupCode}/`
     setForm((prev) => ({ ...prev, serialNumber: prefix + e.target.value }))
   }
+
+  const selectedValue =
+    form.lampModel === OTHER_LAMP_MODEL ? OTHER_OPTION_VALUE : form.lampGroupCode
 
   return (
     <main className="min-h-screen bg-gray-50 py-12 px-4">
@@ -273,18 +303,23 @@ export default function ZgloszenieForm() {
                 </label>
                 <select
                   name="lampModel"
-                  value={form.lampModel}
-                  onChange={handleChange}
+                  value={selectedValue}
+                  onChange={handleLampModelChange}
                   className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                     errors.lampModel ? 'border-red-400' : 'border-gray-300'
                   }`}
                 >
                   <option value="">Wybierz model...</option>
-                  {LAMP_MODELS.map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
+                  {CATEGORIES.map((category) => (
+                    <optgroup key={category} label={category}>
+                      {LAMP_TYPES.filter((t) => t.category === category).map((t) => (
+                        <option key={t.groupCode} value={t.groupCode}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </optgroup>
                   ))}
+                  <option value={OTHER_OPTION_VALUE}>{OTHER_LAMP_MODEL}</option>
                 </select>
                 {errors.lampModel && (
                   <p className="text-red-500 text-xs mt-1">{errors.lampModel}</p>
@@ -295,18 +330,18 @@ export default function ZgloszenieForm() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Numer seryjny
                 </label>
-                {SERIAL_NUMBER_PREFIXES[form.lampModel] ? (
+                {form.lampGroupCode ? (
                   <div className="flex w-full border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
                     <span className="flex items-center bg-gray-100 text-gray-600 text-sm px-3 font-mono">
-                      {SERIAL_NUMBER_PREFIXES[form.lampModel]}
+                      {form.lampGroupCode}/
                     </span>
                     <input
                       type="text"
                       name="serialNumber"
-                      value={form.serialNumber.slice(SERIAL_NUMBER_PREFIXES[form.lampModel].length)}
+                      value={form.serialNumber.slice(form.lampGroupCode.length + 1)}
                       onChange={handleSerialSuffixChange}
                       className="flex-1 min-w-0 px-3 py-2 text-sm focus:outline-none"
-                      placeholder={SERIAL_NUMBER_HINTS[form.lampModel] ?? DEFAULT_SERIAL_HINT}
+                      placeholder={CATALOG_SERIAL_HINT}
                     />
                   </div>
                 ) : (
@@ -316,10 +351,26 @@ export default function ZgloszenieForm() {
                     value={form.serialNumber}
                     onChange={handleChange}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder={SERIAL_NUMBER_HINTS[form.lampModel] ?? DEFAULT_SERIAL_HINT}
+                    placeholder={DEFAULT_SERIAL_HINT}
                   />
                 )}
               </div>
+
+              {form.lampModel === OTHER_LAMP_MODEL && (
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nazwa modelu (jeśli znana)
+                  </label>
+                  <input
+                    type="text"
+                    name="otherModelText"
+                    value={form.otherModelText}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Np. nazwa z tabliczki znamionowej"
+                  />
+                </div>
+              )}
 
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">

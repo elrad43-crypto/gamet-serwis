@@ -1,14 +1,15 @@
 import { NextRequest } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
-import { generateTicketNumber } from '@/lib/ticket-number'
 import { sendTicketConfirmation, sendInternalTicketNotification } from '@/lib/email'
-import { lampSelectionSchema } from '@/lib/validators/ticket'
+import { lampSelectionSchema, ticketNumberSchema } from '@/lib/validators/ticket'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
+      number,
       clientName,
       clientEmail,
       clientPhone,
@@ -23,9 +24,17 @@ export async function POST(request: NextRequest) {
       description,
     } = body
 
-    if (!clientName || !clientEmail || !lampModel || !description) {
+    if (!number || !clientName || !clientEmail || !lampModel || !description) {
       return Response.json(
         { error: 'Brakujące wymagane pola' },
+        { status: 400 }
+      )
+    }
+
+    const numberValidation = ticketNumberSchema.safeParse(number)
+    if (!numberValidation.success) {
+      return Response.json(
+        { error: numberValidation.error.issues[0]?.message ?? 'Nieprawidłowy numer SRW' },
         { status: 400 }
       )
     }
@@ -38,25 +47,37 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const number = await generateTicketNumber()
-
-    const ticket = await prisma.ticket.create({
-      data: {
-        number,
-        clientName,
-        clientEmail,
-        clientPhone: clientPhone || null,
-        companyName: companyName || null,
-        shippingStreet: shippingStreet || null,
-        shippingPostalCode: shippingPostalCode || null,
-        shippingCity: shippingCity || null,
-        lampModel,
-        lampGroupCode: lampGroupCode || null,
-        serialNumber: serialNumber || null,
-        purchaseDate: purchaseDate || null,
-        description,
-      },
-    })
+    let ticket
+    try {
+      ticket = await prisma.ticket.create({
+        data: {
+          number,
+          clientName,
+          clientEmail,
+          clientPhone: clientPhone || null,
+          companyName: companyName || null,
+          shippingStreet: shippingStreet || null,
+          shippingPostalCode: shippingPostalCode || null,
+          shippingCity: shippingCity || null,
+          lampModel,
+          lampGroupCode: lampGroupCode || null,
+          serialNumber: serialNumber || null,
+          purchaseDate: purchaseDate || null,
+          description,
+        },
+      })
+    } catch (createError) {
+      if (
+        createError instanceof Prisma.PrismaClientKnownRequestError &&
+        createError.code === 'P2002'
+      ) {
+        return Response.json(
+          { error: `Zgłoszenie z numerem ${number} już istnieje` },
+          { status: 400 }
+        )
+      }
+      throw createError
+    }
 
     // Wyślij email potwierdzający do klienta
     try {

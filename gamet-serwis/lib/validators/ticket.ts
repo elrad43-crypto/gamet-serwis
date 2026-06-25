@@ -1,6 +1,10 @@
 import { z } from 'zod'
 import { LAMP_TYPES, OTHER_LAMP_MODEL } from '@/lib/lamp-types'
 
+export const ticketNumberSchema = z
+  .string()
+  .regex(/^SRW\/\d{5}\/\d{4}$/, 'Numer musi być w formacie SRW/NNNNN/RRRR (np. SRW/00116/2026)')
+
 export const lampSelectionSchema = z
   .object({
     lampModel: z.string().min(1, 'Wybierz model lampy'),

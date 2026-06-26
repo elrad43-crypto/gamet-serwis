@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { LAMP_TYPES, OTHER_LAMP_MODEL } from '@/lib/lamp-types'
 
 const STATUSES = [
   { value: 'NEW', label: 'Nowe' },
@@ -14,26 +15,44 @@ const STATUSES = [
 export default function TicketActions({
   ticketId,
   currentStatus,
+  currentLampModel,
+  currentLampGroupCode,
 }: {
   ticketId: string
   currentStatus: string
+  currentLampModel: string
+  currentLampGroupCode?: string | null
 }) {
   const router = useRouter()
   const [status, setStatus] = useState(currentStatus)
+  const [lampGroupCode, setLampGroupCode] = useState(currentLampGroupCode ?? '')
   const [note, setNote] = useState('')
   const [isPublic, setIsPublic] = useState(false)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 
+  const selectedLamp = lampGroupCode
+    ? LAMP_TYPES.find((t) => t.groupCode === lampGroupCode) ?? null
+    : null
+  const lampModel = selectedLamp ? selectedLamp.name : OTHER_LAMP_MODEL
+
   async function handleSave() {
     setLoading(true)
     setSuccess(false)
+
+    const lampChanged =
+      lampModel !== currentLampModel || (lampGroupCode || null) !== (currentLampGroupCode ?? null)
 
     try {
       const res = await fetch(`/api/tickets/${ticketId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, note: note.trim() || undefined, isPublic }),
+        body: JSON.stringify({
+          status,
+          note: note.trim() || undefined,
+          isPublic,
+          ...(lampChanged && { lampModel, lampGroupCode: lampGroupCode || null }),
+        }),
       })
 
       if (!res.ok) throw new Error('Błąd')
@@ -52,6 +71,24 @@ export default function TicketActions({
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
       <h2 className="font-semibold text-gray-800 mb-4">Aktualizacja zgłoszenia</h2>
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Produkt
+        </label>
+        <select
+          value={lampGroupCode}
+          onChange={(e) => setLampGroupCode(e.target.value)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          <option value="">Inny / nie wiem</option>
+          {LAMP_TYPES.map((t) => (
+            <option key={t.groupCode} value={t.groupCode}>
+              {t.name} ({t.category})
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">

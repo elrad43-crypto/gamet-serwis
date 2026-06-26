@@ -36,16 +36,20 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
 
   const { id } = await ctx.params
   const body = await request.json()
-  const { status, note, isPublic } = body
+  const { status, note, isPublic, lampModel, lampGroupCode } = body
 
   const ticket = await prisma.ticket.findUnique({ where: { id } })
   if (!ticket) {
     return Response.json({ error: 'Nie znaleziono zgłoszenia' }, { status: 404 })
   }
 
+  const dataToUpdate: Record<string, unknown> = { status }
+  if (lampModel !== undefined) dataToUpdate.lampModel = lampModel
+  if (lampGroupCode !== undefined) dataToUpdate.lampGroupCode = lampGroupCode ?? null
+
   const updated = await prisma.ticket.update({
     where: { id },
-    data: { status },
+    data: dataToUpdate,
   })
 
   if (note) {

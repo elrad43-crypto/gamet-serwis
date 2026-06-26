@@ -153,7 +153,12 @@ export default async function TicketDetailPage({
       )}
 
       {/* Akcje */}
-      <TicketActions ticketId={ticket.id} currentStatus={ticket.status} />
+      <TicketActions
+        ticketId={ticket.id}
+        currentStatus={ticket.status}
+        currentLampModel={ticket.lampModel}
+        currentLampGroupCode={ticket.lampGroupCode}
+      />
     </div>
   )
 }

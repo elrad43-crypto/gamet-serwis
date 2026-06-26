@@ -47,11 +47,17 @@ export async function GET(request: NextRequest) {
     },
   })
 
-  await sendMonthlyReport({
-    month: today.getMonth() + 1,
-    year: today.getFullYear(),
-    tickets,
-  })
+  try {
+    await sendMonthlyReport({
+      month: today.getMonth() + 1,
+      year: today.getFullYear(),
+      tickets,
+    })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[monthly-report] sendMonthlyReport failed:', msg)
+    return Response.json({ error: msg }, { status: 500 })
+  }
 
   return Response.json({
     ok: true,

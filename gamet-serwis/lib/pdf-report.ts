@@ -132,6 +132,9 @@ export function generateMonthlyReportPdf(params: {
       margins: { top: MT, bottom: MB, left: ML, right: ML },
       autoFirstPage: true,
       info: { Title: `Raport miesięczny serwisu — ${monthName} ${year}` },
+      // null prevents pdfkit from loading Helvetica.afm at construction time
+      // (pdfkit checks `if (defaultFont)`, so null skips the default font load)
+      font: null as unknown as string,
     })
 
     // ── WAŻNE: rejestracja fontów z polskimi znakami ──────────────────────────

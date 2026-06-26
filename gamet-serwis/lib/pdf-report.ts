@@ -1,11 +1,11 @@
 import PDFDocument from 'pdfkit'
-import path from 'path'
+import { DEJAVU_SANS_REGULAR, DEJAVU_SANS_BOLD } from '@/lib/font-data'
 
 // DejaVu Sans — open-source font z pełnym zestawem polskich znaków (ą,ę,ś,ó,ł,ń,ć,ż,ź)
-// Helvetica (domyślna w pdfkit) nie ma tych znaków — stąd custom TTF
+// Wbudowany jako base64 — brak zależności od systemu plików (wymagane na Vercelu)
 const FONTS = {
-  regular: path.join(process.cwd(), 'fonts', 'DejaVuSans.ttf'),
-  bold: path.join(process.cwd(), 'fonts', 'DejaVuSans-Bold.ttf'),
+  regular: Buffer.from(DEJAVU_SANS_REGULAR, 'base64'),
+  bold:    Buffer.from(DEJAVU_SANS_BOLD,    'base64'),
 }
 
 const STATUS_LABELS: Record<string, string> = {

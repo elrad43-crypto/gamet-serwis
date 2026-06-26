@@ -108,8 +108,8 @@ export const LAMP_TYPES: LampType[] = [
   { name: 'LAMPA ZESPOLONA', groupCode: 'CL01', category: 'LAMPY ZESPOLONE' },
   { name: 'GENERATOR GAM 150N', groupCode: 'SA01', category: 'GENERATORY' },
   { name: 'GENERATOR GAM 300N', groupCode: 'SA02', category: 'GENERATORY' },
-  { name: 'GŁOŚNIK GAM 200', groupCode: 'SS01', category: 'GŁOŚNIKI' },
-  { name: 'GŁOŚNIK GAM 150', groupCode: 'SS02', category: 'GŁOŚNIKI' },
+  { name: 'GŁOSNIK GROM G100', groupCode: 'SS01', category: 'GŁOŚNIKI' },
+  { name: 'GŁOSNIK GROM G200', groupCode: 'SS02', category: 'GŁOŚNIKI' },
 ]
 
 export function getLampType(groupCode: string): LampType | undefined {

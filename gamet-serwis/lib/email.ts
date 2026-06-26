@@ -16,6 +16,36 @@ const STATUS_LABELS: Record<string, string> = {
   CLOSED: 'Zamknięte',
 }
 
+const SEP_DOUBLE = '═══════════════════════════════════════'
+const SEP_SINGLE = '───────────────────────────────────────'
+const INTRO =
+  'dziękujemy, że zwrócili się Państwo do PW GAMET.\n' +
+  'Każde zgłoszenie traktujemy poważnie i z należytą\n' +
+  'starannością — Państwa sprawa została przyjęta\n' +
+  'i już się nią zajmujemy.'
+
+function buildRow(label: string, value: string, labelWidth: number): string {
+  const prefix = `${label}:`.padEnd(labelWidth)
+  const maxValueWidth = 75 - labelWidth
+  if (value.length <= maxValueWidth) return `${prefix}${value}`
+  const indent = ' '.repeat(labelWidth)
+  const words = value.split(' ')
+  const lines: string[] = []
+  let current = ''
+  for (const word of words) {
+    if (!current) {
+      current = word
+    } else if (current.length + 1 + word.length <= maxValueWidth) {
+      current += ` ${word}`
+    } else {
+      lines.push(current)
+      current = word
+    }
+  }
+  if (current) lines.push(current)
+  return `${prefix}${lines.join('\n' + indent)}`
+}
+
 export async function sendTicketConfirmation(params: {
   to: string
   clientName: string
@@ -25,40 +55,37 @@ export async function sendTicketConfirmation(params: {
   description: string
 }) {
   const lampCategory = getLampCategory(params.lampGroupCode)
+  const rows: [string, string][] = [
+    ['Numer SRW', params.ticketNumber],
+    ['Model lampy', `${params.lampModel}${lampCategory ? ` (${lampCategory})` : ''}`],
+    ['Opis usterki', params.description],
+    ['Status', 'Nowe'],
+  ]
+  const labelWidth = Math.max(...rows.map(([l]) => l.length + 1)) + 1
+  const text = [
+    'POTWIERDZENIE ZGŁOSZENIA SERWISOWEGO',
+    SEP_DOUBLE,
+    '',
+    'Dzień dobry,',
+    '',
+    INTRO,
+    '',
+    'Szczegóły zgłoszenia:',
+    SEP_SINGLE,
+    ...rows.map(([label, value]) => buildRow(label, value, labelWidth)),
+    SEP_SINGLE,
+    '',
+    'Nasz serwis skontaktuje się z Państwem w najbliższym czasie.',
+    '',
+    'Z poważaniem,',
+    'Zespół Serwisu PW GAMET',
+  ].join('\n')
+
   const { error } = await resend.emails.send({
     from: FROM,
     to: params.to,
     subject: `Potwierdzenie zgłoszenia serwisowego #${params.ticketNumber} – Gamet`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1a1a1a;">Zgłoszenie serwisowe przyjęte</h2>
-        <p>Dzień dobry,</p>
-        <p>dziękujemy, że zwrócili się Państwo do PW GAMET. Każde zgłoszenie traktujemy poważnie i z należytą starannością — Państwa sprawa została przyjęta i już się nią zajmujemy. Oto jej szczegóły:</p>
-        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-          <tr style="background: #f5f5f5;">
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Numer zgłoszenia</td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><strong>${params.ticketNumber}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Model lampy</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${params.lampModel}${lampCategory ? ` (${lampCategory})` : ''}</td>
-          </tr>
-          <tr style="background: #f5f5f5;">
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Opis usterki</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${params.description}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Status</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">Nowe</td>
-          </tr>
-        </table>
-        <p>Nasz serwis skontaktuje się z Tobą w najbliższym czasie.</p>
-        <p style="color: #666; font-size: 12px; margin-top: 40px;">
-          Gamet – Producent Lamp Ostrzegawczych<br>
-          Ten email został wygenerowany automatycznie.
-        </p>
-      </div>
-    `,
+    text,
   })
   if (error) throw new Error(`Resend: ${error.message}`)
 }
@@ -84,24 +111,32 @@ export async function sendInternalTicketNotification(params: {
   ]
     .filter(Boolean)
     .join(', ')
-  const modelLine = `${params.lampModel}${lampCategory ? ` (${lampCategory})` : ''}${params.serialNumber ? ` (nr seryjny: ${params.serialNumber})` : ''}`
 
-  const textRows: [string, string][] = [
+  const rows: [string, string][] = [
+    ['Numer SRW', params.ticketNumber],
     ['Klient', `${params.clientName}${params.companyName ? ` (${params.companyName})` : ''}`],
     ['Kontakt', `${params.clientEmail}${params.clientPhone ? `, ${params.clientPhone}` : ''}`],
     ...(shippingAddress ? ([['Adres wysyłki', shippingAddress]] as [string, string][]) : []),
-    ['Model lampy', modelLine],
+    ['Model lampy', `${params.lampModel}${lampCategory ? ` (${lampCategory})` : ''}`],
+    ...(params.serialNumber ? ([['Nr seryjny', params.serialNumber]] as [string, string][]) : []),
     ['Opis usterki', params.description],
   ]
-  const labelWidth = Math.max(...textRows.map(([label]) => label.length + 1)) + 1
+  const labelWidth = Math.max(...rows.map(([l]) => l.length + 1)) + 1
   const text = [
+    'NOWE ZGŁOSZENIE SERWISOWE',
+    SEP_DOUBLE,
+    '',
     'Dzień dobry,',
     '',
-    'dziękujemy, że zwrócili się Państwo do PW GAMET. Każde zgłoszenie traktujemy poważnie i z należytą starannością — Państwa sprawa została przyjęta i już się nią zajmujemy. Oto jej szczegóły:',
+    INTRO,
     '',
-    `NOWE ZGŁOSZENIE — ${params.ticketNumber}`,
+    'Szczegóły zgłoszenia:',
+    SEP_SINGLE,
+    ...rows.map(([label, value]) => buildRow(label, value, labelWidth)),
+    SEP_SINGLE,
     '',
-    ...textRows.map(([label, value]) => `${`${label}:`.padEnd(labelWidth)}${value}`),
+    'Z poważaniem,',
+    'Zespół Serwisu PW GAMET',
   ].join('\n')
 
   const { error } = await resend.emails.send({
@@ -109,43 +144,6 @@ export async function sendInternalTicketNotification(params: {
     to: SERVICE_NOTIFICATION_EMAIL,
     subject: `Nowe zgłoszenie serwisowe #${params.ticketNumber}`,
     text,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1a1a1a;">Nowe zgłoszenie serwisowe</h2>
-        <p>Dzień dobry,</p>
-        <p>dziękujemy, że zwrócili się Państwo do PW GAMET. Każde zgłoszenie traktujemy poważnie i z należytą starannością — Państwa sprawa została przyjęta i już się nią zajmujemy. Oto jej szczegóły:</p>
-        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-          <tr style="background: #f5f5f5;">
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Numer zgłoszenia</td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><strong>${params.ticketNumber}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Klient</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${params.clientName}${params.companyName ? ` (${params.companyName})` : ''}</td>
-          </tr>
-          <tr style="background: #f5f5f5;">
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Kontakt</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${params.clientEmail}${params.clientPhone ? `, ${params.clientPhone}` : ''}</td>
-          </tr>
-          ${
-            params.shippingStreet || params.shippingPostalCode || params.shippingCity
-              ? `<tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Adres wysyłki</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${[params.shippingStreet, params.shippingPostalCode, params.shippingCity].filter(Boolean).join(', ')}</td>
-          </tr>`
-              : ''
-          }
-          <tr style="background: #f5f5f5;">
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Model lampy</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${params.lampModel}${lampCategory ? ` (${lampCategory})` : ''}${params.serialNumber ? ` (nr seryjny: ${params.serialNumber})` : ''}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Opis usterki</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${params.description}</td>
-          </tr>
-        </table>
-      </div>
-    `,
   })
   if (error) throw new Error(`Resend: ${error.message}`)
 }

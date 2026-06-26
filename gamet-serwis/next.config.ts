@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Dołącz fonty TTF do bundle'a funkcji cron (potrzebne do PDF z polskimi znakami)
+  outputFileTracingIncludes: {
+    '/api/cron/monthly-report': ['./fonts/**/*'],
+  },
 };
 
 export default nextConfig;

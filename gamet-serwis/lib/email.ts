@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { getLampCategory } from '@/lib/lamp-types'
+import { generateMonthlyReportPdf } from '@/lib/pdf-report'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -227,27 +228,7 @@ export async function sendMonthlyReport(params: {
     }
   }
 
-  const csvEsc = (v: string) => `"${v.replace(/"/g, '""').replace(/[\r\n]+/g, ' ')}"`
-  const csvHeader = [
-    'Numer SRW', 'Klient', 'Firma', 'Kontakt (e-mail)', 'Kontakt (telefon)',
-    'Model lampy', 'Nr seryjny', 'Status', 'Data utworzenia', 'Opis',
-  ].map(csvEsc).join(';')
-  const csvRows = tickets.map(t => {
-    const cat = getLampCategory(t.lampGroupCode)
-    return [
-      t.number,
-      t.clientName,
-      t.companyName ?? '',
-      t.clientEmail,
-      t.clientPhone ?? '',
-      `${t.lampModel}${cat ? ` (${cat})` : ''}`,
-      t.serialNumber ?? '',
-      STATUS_LABELS[t.status] ?? t.status,
-      t.createdAt.toLocaleDateString('pl-PL'),
-      t.description,
-    ].map(csvEsc).join(';')
-  })
-  const csv = '﻿' + [csvHeader, ...csvRows].join('\r\n')
+  const pdf = await generateMonthlyReportPdf({ month, year, tickets })
 
   const text = [
     `RAPORT MIESIĘCZNY SERWISU — ${monthLabel}`,
@@ -268,7 +249,7 @@ export async function sendMonthlyReport(params: {
           ...ticketLines,
           SEP_SINGLE,
           '',
-          'W załączniku pełna lista w formacie CSV (do otwarcia w Excelu).',
+          'W załączniku raport w formacie PDF.',
         ]
       : ['Brak zgłoszeń w tym miesiącu.']),
     '',
@@ -283,8 +264,8 @@ export async function sendMonthlyReport(params: {
     text,
     attachments: [
       {
-        filename: `raport-serwis-${year}-${String(month).padStart(2, '0')}.csv`,
-        content: Buffer.from(csv, 'utf-8'),
+        filename: `raport-serwis-${year}-${String(month).padStart(2, '0')}.pdf`,
+        content: pdf,
       },
     ],
   })

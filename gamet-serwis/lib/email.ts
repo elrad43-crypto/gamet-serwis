@@ -148,6 +148,149 @@ export async function sendInternalTicketNotification(params: {
   if (error) throw new Error(`Resend: ${error.message}`)
 }
 
+const MONTHS_PL = [
+  'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
+  'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień',
+]
+
+export type TicketForReport = {
+  number: string
+  clientName: string
+  companyName?: string | null
+  clientEmail: string
+  clientPhone?: string | null
+  lampModel: string
+  lampGroupCode?: string | null
+  serialNumber?: string | null
+  status: string
+  createdAt: Date
+  description: string
+}
+
+export async function sendMonthlyReport(params: {
+  month: number
+  year: number
+  tickets: TicketForReport[]
+}) {
+  const { month, year, tickets } = params
+  const monthName = MONTHS_PL[month - 1]
+  const monthLabel = `${monthName.toUpperCase()} ${year}`
+
+  const firstDay = `01.${String(month).padStart(2, '0')}.${year}`
+  const lastDayDate = new Date(year, month, 0)
+  const lastDay = `${String(lastDayDate.getDate()).padStart(2, '0')}.${String(month).padStart(2, '0')}.${year}`
+
+  const counts: Record<string, number> = {}
+  for (const t of tickets) counts[t.status] = (counts[t.status] ?? 0) + 1
+
+  const summaryRows: [string, string][] = [
+    ['Nowe', String(counts['NEW'] ?? 0)],
+    ['W realizacji', String(counts['IN_PROGRESS'] ?? 0)],
+    ['Oczekiwanie na części', String(counts['WAITING_FOR_PARTS'] ?? 0)],
+    ['Zakończone', String(counts['COMPLETED'] ?? 0)],
+    ['Zamknięte', String(counts['CLOSED'] ?? 0)],
+  ]
+  const summaryLabelWidth = Math.max(...summaryRows.map(([l]) => l.length + 1)) + 1
+
+  const truncate = (s: string, max: number) =>
+    s.length > max ? s.slice(0, max - 1) + '…' : s
+
+  const ticketLines: string[] = []
+  if (tickets.length > 0) {
+    const numW = 16
+    const clientMax = Math.min(Math.max(...tickets.map(t => {
+      const c = t.companyName ? `${t.clientName} (${t.companyName})` : t.clientName
+      return c.length
+    })), 26)
+    const clientW = clientMax + 2
+    const modelMax = Math.min(Math.max(...tickets.map(t => {
+      const cat = getLampCategory(t.lampGroupCode)
+      return `${t.lampModel}${cat ? ` (${cat})` : ''}`.length
+    })), 22)
+    const modelW = modelMax + 2
+    const statusW = 23
+
+    for (const t of tickets) {
+      const client = t.companyName ? `${t.clientName} (${t.companyName})` : t.clientName
+      const cat = getLampCategory(t.lampGroupCode)
+      const model = `${t.lampModel}${cat ? ` (${cat})` : ''}`
+      const status = STATUS_LABELS[t.status] ?? t.status
+      const d = t.createdAt
+      const date = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`
+      ticketLines.push(
+        t.number.padEnd(numW) +
+        truncate(client, clientMax).padEnd(clientW) +
+        truncate(model, modelMax).padEnd(modelW) +
+        status.padEnd(statusW) +
+        date
+      )
+    }
+  }
+
+  const csvEsc = (v: string) => `"${v.replace(/"/g, '""').replace(/[\r\n]+/g, ' ')}"`
+  const csvHeader = [
+    'Numer SRW', 'Klient', 'Firma', 'Kontakt (e-mail)', 'Kontakt (telefon)',
+    'Model lampy', 'Nr seryjny', 'Status', 'Data utworzenia', 'Opis',
+  ].map(csvEsc).join(';')
+  const csvRows = tickets.map(t => {
+    const cat = getLampCategory(t.lampGroupCode)
+    return [
+      t.number,
+      t.clientName,
+      t.companyName ?? '',
+      t.clientEmail,
+      t.clientPhone ?? '',
+      `${t.lampModel}${cat ? ` (${cat})` : ''}`,
+      t.serialNumber ?? '',
+      STATUS_LABELS[t.status] ?? t.status,
+      t.createdAt.toLocaleDateString('pl-PL'),
+      t.description,
+    ].map(csvEsc).join(';')
+  })
+  const csv = '﻿' + [csvHeader, ...csvRows].join('\r\n')
+
+  const text = [
+    `RAPORT MIESIĘCZNY SERWISU — ${monthLabel}`,
+    SEP_DOUBLE,
+    '',
+    buildRow('Okres', `${firstDay} – ${lastDay}`, 11),
+    buildRow('Zgłoszeń', String(tickets.length), 11),
+    '',
+    'PODSUMOWANIE PO STATUSACH',
+    SEP_SINGLE,
+    ...summaryRows.map(([l, v]) => buildRow(l, v, summaryLabelWidth)),
+    SEP_SINGLE,
+    '',
+    ...(tickets.length > 0
+      ? [
+          'LISTA ZGŁOSZEŃ',
+          SEP_SINGLE,
+          ...ticketLines,
+          SEP_SINGLE,
+          '',
+          'W załączniku pełna lista w formacie CSV (do otwarcia w Excelu).',
+        ]
+      : ['Brak zgłoszeń w tym miesiącu.']),
+    '',
+    'Z poważaniem,',
+    'Zespół Serwisu PW GAMET',
+  ].join('\n')
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: SERVICE_NOTIFICATION_EMAIL,
+    subject: `Raport miesięczny serwisu — ${monthName} ${year}`,
+    text,
+    attachments: [
+      {
+        filename: `raport-serwis-${year}-${String(month).padStart(2, '0')}.csv`,
+        content: Buffer.from(csv, 'utf-8'),
+      },
+    ],
+  })
+  if (error) throw new Error(`Resend: ${error.message}`)
+}
+
 export async function sendStatusUpdate(params: {
   to: string
   clientName: string

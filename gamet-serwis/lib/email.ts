@@ -193,40 +193,16 @@ export async function sendMonthlyReport(params: {
   ]
   const summaryLabelWidth = Math.max(...summaryRows.map(([l]) => l.length + 1)) + 1
 
-  const truncate = (s: string, max: number) =>
-    s.length > max ? s.slice(0, max - 1) + '…' : s
-
-  const ticketLines: string[] = []
-  if (tickets.length > 0) {
-    const numW = 16
-    const clientMax = Math.min(Math.max(...tickets.map(t => {
-      const c = t.companyName ? `${t.clientName} (${t.companyName})` : t.clientName
-      return c.length
-    })), 26)
-    const clientW = clientMax + 2
-    const modelMax = Math.min(Math.max(...tickets.map(t => {
-      const cat = getLampCategory(t.lampGroupCode)
-      return `${t.lampModel}${cat ? ` (${cat})` : ''}`.length
-    })), 22)
-    const modelW = modelMax + 2
-    const statusW = 23
-
-    for (const t of tickets) {
-      const client = t.companyName ? `${t.clientName} (${t.companyName})` : t.clientName
-      const cat = getLampCategory(t.lampGroupCode)
-      const model = `${t.lampModel}${cat ? ` (${cat})` : ''}`
-      const status = STATUS_LABELS[t.status] ?? t.status
-      const d = t.createdAt
-      const date = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`
-      ticketLines.push(
-        t.number.padEnd(numW) +
-        truncate(client, clientMax).padEnd(clientW) +
-        truncate(model, modelMax).padEnd(modelW) +
-        status.padEnd(statusW) +
-        date
-      )
-    }
+  // Grupuj po nazwie produktu, pokaż tylko produkt i ilość
+  const productCounts = new Map<string, number>()
+  for (const t of tickets) {
+    const cat = getLampCategory(t.lampGroupCode)
+    const product = `${t.lampModel}${cat ? ` (${cat})` : ''}`
+    productCounts.set(product, (productCounts.get(product) ?? 0) + 1)
   }
+  const productLines = [...productCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([product, count]) => `${product.padEnd(38)}${String(count).padStart(3)} szt.`)
 
   const pdf = await generateMonthlyReportPdf({ month, year, tickets })
 
@@ -244,9 +220,9 @@ export async function sendMonthlyReport(params: {
     '',
     ...(tickets.length > 0
       ? [
-          'LISTA ZGŁOSZEŃ',
+          'PRODUKTY',
           SEP_SINGLE,
-          ...ticketLines,
+          ...productLines,
           SEP_SINGLE,
           '',
           'W załączniku raport w formacie PDF.',

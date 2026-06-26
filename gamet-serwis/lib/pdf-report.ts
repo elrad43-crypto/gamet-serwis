@@ -43,7 +43,7 @@ const CW = PAGE_W - ML * 2  // content width = 495.28
 const COLS = [
   { label: 'Numer SRW',   w: 115, get: (t: PdfTicketRow) => t.number },
   { label: 'Firma',       w: 140, get: (t: PdfTicketRow) => t.companyName ?? '—' },
-  { label: 'Model lampy', w: 130, get: (t: PdfTicketRow) => t.lampModel },
+  { label: 'Produkt',     w: 130, get: (t: PdfTicketRow) => t.lampModel },
   { label: 'Nr seryjny',  w: 70,  get: (t: PdfTicketRow) => t.serialNumber ?? '—' },
   { label: 'Data',        w: 40,  get: (t: PdfTicketRow) => {
     const d = t.createdAt

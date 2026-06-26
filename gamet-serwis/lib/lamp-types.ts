@@ -19,6 +19,7 @@ export const LAMP_TYPES: LampType[] = [
   { name: 'WYŚWIETLACZ MATRYCOWY 12x60', groupCode: 'AD04', category: 'WYŚWIETLACZE' },
   { name: 'WYŚWIETLACZ MATRYCOWY INFOSYSTEM 8x80', groupCode: 'AD05', category: 'WYŚWIETLACZE' },
   { name: 'PANEL STERUJĄCY INFOSYSTEM', groupCode: 'AD06', category: 'WYŚWIETLACZE' },
+  { name: 'WYŚWIETLACZ MATRYCOWY 8X60 PODNOSZONY/OPUSZCZANY', groupCode: 'AD07', category: 'WYŚWIETLACZE' },
   { name: 'PS2 AF', groupCode: 'AF01', category: 'AUTOFORM' },
   { name: 'SZYLD LED AF', groupCode: 'AF02', category: 'AUTOFORM' },
   { name: 'AMZ MBSN1-BB', groupCode: 'AK01', category: 'AMZ KUTNO' },

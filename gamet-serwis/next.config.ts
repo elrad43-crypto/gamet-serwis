@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Dołącz fonty TTF do bundle'a funkcji cron (potrzebne do PDF z polskimi znakami)
+  // Dołącz pliki metryczne pdfkit (AFM) — wymagane przez pdfkit na Vercelu
   outputFileTracingIncludes: {
-    '/api/cron/monthly-report': ['./fonts/**/*'],
+    '/api/cron/monthly-report': ['./node_modules/pdfkit/js/data/**/*'],
   },
 };
 

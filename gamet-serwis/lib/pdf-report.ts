@@ -41,12 +41,10 @@ const CW = PAGE_W - ML * 2  // content width = 495.28
 
 // Kolumny tabeli — szerokości sumują się do CW (495)
 const COLS = [
-  { label: 'Numer SRW',   w: 92,  get: (t: PdfTicketRow) => t.number },
-  { label: 'Klient',      w: 85,  get: (t: PdfTicketRow) => t.clientName },
-  { label: 'Firma',       w: 68,  get: (t: PdfTicketRow) => t.companyName ?? '—' },
-  { label: 'Model lampy', w: 83,  get: (t: PdfTicketRow) => t.lampModel },
-  { label: 'Nr seryjny',  w: 52,  get: (t: PdfTicketRow) => t.serialNumber ?? '—' },
-  { label: 'Status',      w: 75,  get: (t: PdfTicketRow) => STATUS_LABELS[t.status] ?? t.status },
+  { label: 'Numer SRW',   w: 115, get: (t: PdfTicketRow) => t.number },
+  { label: 'Firma',       w: 140, get: (t: PdfTicketRow) => t.companyName ?? '—' },
+  { label: 'Model lampy', w: 130, get: (t: PdfTicketRow) => t.lampModel },
+  { label: 'Nr seryjny',  w: 70,  get: (t: PdfTicketRow) => t.serialNumber ?? '—' },
   { label: 'Data',        w: 40,  get: (t: PdfTicketRow) => {
     const d = t.createdAt
     return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`

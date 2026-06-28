@@ -78,3 +78,21 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
 
   return Response.json({ ticket: updated })
 }
+
+export async function DELETE(_req: NextRequest, ctx: Ctx) {
+  const session = await auth()
+  if (!session?.user) {
+    return Response.json({ error: 'Brak autoryzacji' }, { status: 401 })
+  }
+
+  const { id } = await ctx.params
+
+  const ticket = await prisma.ticket.findUnique({ where: { id } })
+  if (!ticket) {
+    return Response.json({ error: 'Nie znaleziono zgłoszenia' }, { status: 404 })
+  }
+
+  await prisma.ticket.delete({ where: { id } })
+
+  return Response.json({ ok: true })
+}

@@ -30,11 +30,26 @@ export default function TicketActions({
   const [isPublic, setIsPublic] = useState(false)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const selectedLamp = lampGroupCode
     ? LAMP_TYPES.find((t) => t.groupCode === lampGroupCode) ?? null
     : null
   const lampModel = selectedLamp ? selectedLamp.name : OTHER_LAMP_MODEL
+
+  async function handleDelete() {
+    if (!confirm('Czy na pewno chcesz usunąć to zgłoszenie? Tej operacji nie można cofnąć.')) return
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/tickets/${ticketId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Błąd')
+      router.push('/admin/zgloszenia')
+      router.refresh()
+    } catch {
+      alert('Wystąpił błąd podczas usuwania.')
+      setDeleting(false)
+    }
+  }
 
   async function handleSave() {
     setLoading(true)
@@ -141,11 +156,21 @@ export default function TicketActions({
 
       <button
         onClick={handleSave}
-        disabled={loading}
+        disabled={loading || deleting}
         className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2.5 rounded-lg transition-colors"
       >
         {loading ? 'Zapisywanie...' : 'Zapisz zmiany'}
       </button>
+
+      <div className="mt-6 pt-6 border-t border-gray-100">
+        <button
+          onClick={handleDelete}
+          disabled={loading || deleting}
+          className="w-full bg-white hover:bg-red-50 disabled:opacity-50 text-red-600 border border-red-200 font-medium py-2.5 rounded-lg transition-colors text-sm"
+        >
+          {deleting ? 'Usuwanie...' : 'Usuń zgłoszenie'}
+        </button>
+      </div>
     </div>
   )
 }

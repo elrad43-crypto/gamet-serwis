@@ -42,3 +42,7 @@ next-env.d.ts
 
 /app/generated/prisma
 create-admin.mjs
+
+# local test scripts and outputs
+test-*.mts
+test-output.*

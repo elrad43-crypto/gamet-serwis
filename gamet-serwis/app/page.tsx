@@ -23,6 +23,14 @@ export default function Home() {
           >
             Złóż zgłoszenie serwisowe
           </Link>
+          <div className="mt-4">
+            <Link
+              href="/kontakt"
+              className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+            >
+              Kontakt i dane firmy
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4 text-center text-sm text-gray-500">

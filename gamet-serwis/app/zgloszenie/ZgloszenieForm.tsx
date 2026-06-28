@@ -91,7 +91,8 @@ export default function ZgloszenieForm() {
       if (!res.ok) throw new Error('Błąd serwera')
 
       const data = await res.json()
-      router.push(`/zgloszenie/potwierdzenie?nr=${data.ticket.number}`)
+      const nr = data.ticket.number
+      router.push(`/zgloszenie/potwierdzenie${nr ? `?nr=${nr}` : ''}`)
     } catch {
       setErrors({ description: 'Wystąpił błąd. Spróbuj ponownie.' })
     } finally {

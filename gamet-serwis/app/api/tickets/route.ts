@@ -24,19 +24,21 @@ export async function POST(request: NextRequest) {
       description,
     } = body
 
-    if (!number || !clientName || !clientEmail || !lampModel || !description) {
+    if (!clientName || !clientEmail || !lampModel || !description) {
       return Response.json(
         { error: 'Brakujące wymagane pola' },
         { status: 400 }
       )
     }
 
-    const numberValidation = ticketNumberSchema.safeParse(number)
-    if (!numberValidation.success) {
-      return Response.json(
-        { error: numberValidation.error.issues[0]?.message ?? 'Nieprawidłowy numer SRW' },
-        { status: 400 }
-      )
+    if (number) {
+      const numberValidation = ticketNumberSchema.safeParse(number)
+      if (!numberValidation.success) {
+        return Response.json(
+          { error: numberValidation.error.issues[0]?.message ?? 'Nieprawidłowy numer SRW' },
+          { status: 400 }
+        )
+      }
     }
 
     const lampSelection = lampSelectionSchema.safeParse({ lampModel, lampGroupCode })
@@ -51,7 +53,7 @@ export async function POST(request: NextRequest) {
     try {
       ticket = await prisma.ticket.create({
         data: {
-          number,
+          number: number ?? null,
           clientName,
           clientEmail,
           clientPhone: clientPhone || null,

@@ -50,14 +50,14 @@ function buildRow(label: string, value: string, labelWidth: number): string {
 export async function sendTicketConfirmation(params: {
   to: string
   clientName: string
-  ticketNumber: string
+  ticketNumber?: string | null
   lampModel: string
   lampGroupCode?: string | null
   description: string
 }) {
   const lampCategory = getLampCategory(params.lampGroupCode)
   const rows: [string, string][] = [
-    ['Numer SRW', params.ticketNumber],
+    ...(params.ticketNumber ? [['Numer SRW', params.ticketNumber] as [string, string]] : []),
     ['Model lampy', `${params.lampModel}${lampCategory ? ` (${lampCategory})` : ''}`],
     ['Opis usterki', params.description],
     ['Status', 'Nowe'],
@@ -85,14 +85,16 @@ export async function sendTicketConfirmation(params: {
   const { error } = await resend.emails.send({
     from: FROM,
     to: params.to,
-    subject: `Potwierdzenie zgłoszenia serwisowego #${params.ticketNumber} – Gamet`,
+    subject: params.ticketNumber
+      ? `Potwierdzenie zgłoszenia serwisowego #${params.ticketNumber} – Gamet`
+      : `Potwierdzenie zgłoszenia serwisowego – Gamet`,
     text,
   })
   if (error) throw new Error(`Resend: ${error.message}`)
 }
 
 export async function sendInternalTicketNotification(params: {
-  ticketNumber: string
+  ticketNumber?: string | null
   clientName: string
   clientEmail: string
   clientPhone?: string | null
@@ -114,7 +116,7 @@ export async function sendInternalTicketNotification(params: {
     .join(', ')
 
   const rows: [string, string][] = [
-    ['Numer SRW', params.ticketNumber],
+    ...(params.ticketNumber ? [['Numer SRW', params.ticketNumber] as [string, string]] : []),
     ['Klient', `${params.clientName}${params.companyName ? ` (${params.companyName})` : ''}`],
     ['Kontakt', `${params.clientEmail}${params.clientPhone ? `, ${params.clientPhone}` : ''}`],
     ...(shippingAddress ? ([['Adres wysyłki', shippingAddress]] as [string, string][]) : []),
@@ -143,7 +145,9 @@ export async function sendInternalTicketNotification(params: {
   const { error } = await resend.emails.send({
     from: FROM,
     to: SERVICE_NOTIFICATION_EMAIL,
-    subject: `Nowe zgłoszenie serwisowe #${params.ticketNumber}`,
+    subject: params.ticketNumber
+      ? `Nowe zgłoszenie serwisowe #${params.ticketNumber}`
+      : `Nowe zgłoszenie serwisowe`,
     text,
   })
   if (error) throw new Error(`Resend: ${error.message}`)

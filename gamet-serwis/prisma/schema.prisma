@@ -8,7 +8,7 @@ datasource db {
 
 model Ticket {
   id                 String       @id @default(cuid())
-  number             String       @unique
+  number             String?      @unique
   clientName         String
   clientEmail        String
   clientPhone        String?

@@ -22,7 +22,7 @@ const MONTHS_PL = [
 ]
 
 export type PdfTicketRow = {
-  number: string
+  number: string | null
   clientName: string
   companyName?: string | null
   lampModel: string
@@ -41,7 +41,7 @@ const CW = PAGE_W - ML * 2  // content width = 495.28
 
 // Kolumny tabeli — szerokości sumują się do CW (495)
 const COLS = [
-  { label: 'Numer SRW',   w: 115, get: (t: PdfTicketRow) => t.number },
+  { label: 'Numer SRW',   w: 115, get: (t: PdfTicketRow) => t.number ?? '—' },
   { label: 'Firma',       w: 140, get: (t: PdfTicketRow) => t.companyName ?? '—' },
   { label: 'Produkt',     w: 130, get: (t: PdfTicketRow) => t.lampModel },
   { label: 'Nr seryjny',  w: 70,  get: (t: PdfTicketRow) => t.serialNumber ?? '—' },

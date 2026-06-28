@@ -159,7 +159,7 @@ const MONTHS_PL = [
 ]
 
 export type TicketForReport = {
-  number: string
+  number: string | null
   clientName: string
   companyName?: string | null
   clientEmail: string
@@ -255,28 +255,29 @@ export async function sendMonthlyReport(params: {
 export async function sendStatusUpdate(params: {
   to: string
   clientName: string
-  ticketNumber: string
+  ticketNumber: string | null
   newStatus: string
   note?: string
 }) {
   const statusLabel = STATUS_LABELS[params.newStatus] || params.newStatus
+  const ticketRef = params.ticketNumber ? `#${params.ticketNumber}` : 'Twojego zgłoszenia'
 
   const { error } = await resend.emails.send({
     from: FROM,
     to: params.to,
-    subject: `Aktualizacja zgłoszenia #${params.ticketNumber} – ${statusLabel}`,
+    subject: `Aktualizacja ${ticketRef} – ${statusLabel}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #1a1a1a;">Aktualizacja zgłoszenia serwisowego</h2>
         <p>Dzień dobry ${params.clientName},</p>
-        <p>Status Twojego zgłoszenia serwisowego <strong>#${params.ticketNumber}</strong> został zaktualizowany:</p>
+        <p>Status ${ticketRef === 'Twojego zgłoszenia' ? ticketRef : `zgłoszenia serwisowego <strong>${ticketRef}</strong>`} został zaktualizowany:</p>
         <div style="background: #f0f7ff; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0;">
           <strong>Nowy status: ${statusLabel}</strong>
         </div>
         ${params.note ? `<p><strong>Wiadomość od serwisu:</strong> ${params.note}</p>` : ''}
         <p>W razie pytań prosimy o kontakt.</p>
         <p style="color: #666; font-size: 12px; margin-top: 40px;">
-          Gamet – Producent Lamp Ostrzegawczych<br>
+          Gamet &#x2013; Producent Lamp Ostrzegawczych<br>
           Ten email został wygenerowany automatycznie.
         </p>
       </div>

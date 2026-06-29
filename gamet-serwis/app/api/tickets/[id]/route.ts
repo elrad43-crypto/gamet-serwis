@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
-import { sendStatusUpdate } from '@/lib/email'
+import { sendStatusUpdate, sendShipmentNotification } from '@/lib/email'
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -36,7 +36,7 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
 
   const { id } = await ctx.params
   const body = await request.json()
-  const { status, note, isPublic, lampModel, lampGroupCode, shipmentNumber } = body
+  const { status, note, isPublic, lampModel, lampGroupCode, shipmentNumber, notifyShipment } = body
 
   const ticket = await prisma.ticket.findUnique({ where: { id } })
   if (!ticket) {
@@ -74,6 +74,18 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
       })
     } catch (emailError) {
       console.error('Błąd wysyłania emaila o statusie:', emailError)
+    }
+  }
+
+  if (notifyShipment && shipmentNumber) {
+    try {
+      await sendShipmentNotification({
+        to: ticket.clientEmail,
+        clientName: ticket.clientName,
+        shipmentNumber,
+      })
+    } catch (emailError) {
+      console.error('Błąd wysyłania emaila o wysyłce:', emailError)
     }
   }
 

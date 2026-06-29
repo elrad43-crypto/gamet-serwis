@@ -252,6 +252,44 @@ export async function sendMonthlyReport(params: {
   if (error) throw new Error(`Resend: ${error.message}`)
 }
 
+export async function sendShipmentNotification(params: {
+  to: string
+  clientName: string
+  shipmentNumber: string
+}) {
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: params.to,
+    subject: 'Serwis zakończony – zgłoszenie zostało nadane',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1a1a1a;">Serwis zakończony – przesyłka nadana</h2>
+        <p>Dzień dobry ${params.clientName},</p>
+        <p>z przyjemnością informujemy, że serwis Państwa urządzenia został zakończony.
+        Naprawiony sprzęt został właśnie nadany przesyłką kurierską na wskazany adres.</p>
+        <div style="background: #f0fdf4; border-left: 4px solid #16a34a; padding: 15px; margin: 20px 0;">
+          <strong>Numer przesyłki: ${params.shipmentNumber}</strong>
+        </div>
+        <p>Status przesyłki mogą Państwo śledzić na stronie przewoźnika.</p>
+        <p>Dziękujemy za zaufanie i skorzystanie z naszego serwisu.
+        W razie pytań pozostajemy do Państwa dyspozycji.</p>
+        <p style="margin-top: 30px;">
+          Z poważaniem,<br>
+          <strong>Zespół serwisu</strong><br>
+          Przedsiębiorstwo Wytwórcze GAMET<br>
+          tel. +48 24 365 26 00<br>
+          info@pwgamet.com.pl
+        </p>
+        <p style="color: #666; font-size: 12px; margin-top: 40px;">
+          Gamet – Producent Lamp Ostrzegawczych<br>
+          Ten email został wygenerowany automatycznie.
+        </p>
+      </div>
+    `,
+  })
+  if (error) throw new Error(`Resend: ${error.message}`)
+}
+
 export async function sendStatusUpdate(params: {
   to: string
   clientName: string

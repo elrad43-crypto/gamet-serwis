@@ -112,6 +112,12 @@ export default async function TicketDetailPage({
               <span>{ticket.purchaseDate}</span>
             </div>
           )}
+          {ticket.shipmentNumber && (
+            <div>
+              <span className="text-gray-500">Nr przesyłki:</span>{' '}
+              <span className="font-mono font-medium">{ticket.shipmentNumber}</span>
+            </div>
+          )}
           <div>
             <span className="text-gray-500">Zgłoszono:</span>{' '}
             <span>{new Date(ticket.createdAt).toLocaleDateString('pl-PL', {
@@ -158,6 +164,7 @@ export default async function TicketDetailPage({
         currentStatus={ticket.status}
         currentLampModel={ticket.lampModel}
         currentLampGroupCode={ticket.lampGroupCode}
+        currentShipmentNumber={ticket.shipmentNumber}
       />
     </div>
   )

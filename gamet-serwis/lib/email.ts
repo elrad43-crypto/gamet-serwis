@@ -257,9 +257,12 @@ export async function sendShipmentNotification(params: {
   clientName: string
   shipmentNumber: string
 }) {
+  // TODO: usunąć po konfiguracji domeny w Resend — wtedy wysyłać na params.to
+  const SHIPMENT_TEST_RECIPIENT = 'elrad43@gmail.com'
+
   const { error } = await resend.emails.send({
     from: FROM,
-    to: params.to,
+    to: SHIPMENT_TEST_RECIPIENT,
     subject: 'Serwis zakończony – zgłoszenie zostało nadane',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

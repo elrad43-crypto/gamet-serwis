@@ -237,6 +237,14 @@ export async function sendMonthlyReport(params: {
         ]
       : ['Brak zgłoszeń w tym miesiącu.']),
     '',
+    SEP_SINGLE,
+    'Niniejszy raport został wygenerowany automatycznie przez system zarządzania',
+    'zgłoszeniami serwisowymi z wykorzystaniem technologii AI. Jego celem jest',
+    'wyłącznie usprawnienie pracy serwisu i poprawa jakości obsługi klientów.',
+    'Raport nie stanowi oceny pracowników ani nie ma na celu szykanowania',
+    'kogokolwiek — jest narzędziem wspierającym codzienną działalność serwisu.',
+    SEP_SINGLE,
+    '',
     'Z poważaniem,',
     'Zespół Serwisu PW GAMET',
   ].join('\n')

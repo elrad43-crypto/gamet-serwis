@@ -280,7 +280,7 @@ export async function sendShipmentNotification(params: {
           Z poważaniem,<br>
           <strong>Zespół serwisu</strong><br>
           Przedsiębiorstwo Wytwórcze GAMET<br>
-          tel. 243652602<br>
+          tel. +48 24 365 26 02<br>
           serwis@pwgamet.com.pl
         </p>
         <p style="color: #666; font-size: 12px; margin-top: 40px;">

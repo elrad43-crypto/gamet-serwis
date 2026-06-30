@@ -280,8 +280,8 @@ export async function sendShipmentNotification(params: {
           Z poważaniem,<br>
           <strong>Zespół serwisu</strong><br>
           Przedsiębiorstwo Wytwórcze GAMET<br>
-          tel. +48 24 365 26 00<br>
-          info@pwgamet.com.pl
+          tel. 243652602<br>
+          serwis@pwgamet.com.pl
         </p>
         <p style="color: #666; font-size: 12px; margin-top: 40px;">
           Gamet – Producent Lamp Ostrzegawczych<br>

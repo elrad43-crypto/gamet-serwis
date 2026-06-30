@@ -83,6 +83,7 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
         to: ticket.clientEmail,
         clientName: ticket.clientName,
         shipmentNumber,
+        ticketNumber: ticket.number,
       })
     } catch (emailError) {
       console.error('Błąd wysyłania emaila o wysyłce:', emailError)

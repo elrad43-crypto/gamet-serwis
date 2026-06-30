@@ -19,6 +19,13 @@ const STATUS_LABELS: Record<string, string> = {
 
 const SEP_DOUBLE = '═══════════════════════════════════════'
 const SEP_SINGLE = '───────────────────────────────────────'
+const FOOTER_LINES = [
+  'Z poważaniem,',
+  'Zespół serwisu',
+  'Przedsiębiorstwo Wytwórcze GAMET',
+  'tel. +48 24 365 26 02',
+  'serwis@pwgamet.com.pl',
+]
 const INTRO =
   'dziękujemy, że zwrócili się Państwo do PW GAMET.\n' +
   'Każde zgłoszenie traktujemy poważnie i z należytą\n' +
@@ -78,8 +85,7 @@ export async function sendTicketConfirmation(params: {
     '',
     'Nasz serwis skontaktuje się z Państwem w najbliższym czasie.',
     '',
-    'Z poważaniem,',
-    'Zespół Serwisu PW GAMET',
+    ...FOOTER_LINES,
   ].join('\n')
 
   const { error } = await resend.emails.send({
@@ -268,6 +274,7 @@ export async function sendShipmentNotification(params: {
   to: string
   clientName: string
   shipmentNumber: string
+  ticketNumber?: string | null
 }) {
   // TODO: usunąć po konfiguracji domeny w Resend — wtedy wysyłać na params.to
   const SHIPMENT_TEST_RECIPIENT = 'elrad43@gmail.com'
@@ -275,12 +282,14 @@ export async function sendShipmentNotification(params: {
   const { error } = await resend.emails.send({
     from: FROM,
     to: SHIPMENT_TEST_RECIPIENT,
-    subject: 'Serwis zakończony – zgłoszenie zostało nadane',
+    subject: params.ticketNumber
+      ? `Serwis zakończony – przesyłka nadana (${params.ticketNumber})`
+      : 'Serwis zakończony – przesyłka nadana',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #1a1a1a;">Serwis zakończony – przesyłka nadana</h2>
         <p>Dzień dobry ${params.clientName},</p>
-        <p>z przyjemnością informujemy, że serwis Państwa urządzenia został zakończony.
+        <p>z przyjemnością informujemy, że serwis Państwa urządzenia${params.ticketNumber ? ` (zgłoszenie ${params.ticketNumber})` : ''} został zakończony.
         Naprawiony sprzęt został właśnie nadany przesyłką kurierską na wskazany adres.</p>
         <div style="background: #f0fdf4; border-left: 4px solid #16a34a; padding: 15px; margin: 20px 0;">
           <strong>Numer przesyłki: ${params.shipmentNumber}</strong>
@@ -289,11 +298,7 @@ export async function sendShipmentNotification(params: {
         <p>Dziękujemy za zaufanie i skorzystanie z naszego serwisu.
         W razie pytań pozostajemy do Państwa dyspozycji.</p>
         <p style="margin-top: 30px;">
-          Z poważaniem,<br>
-          <strong>Zespół serwisu</strong><br>
-          Przedsiębiorstwo Wytwórcze GAMET<br>
-          tel. +48 24 365 26 02<br>
-          serwis@pwgamet.com.pl
+          ${FOOTER_LINES.join('<br>\n          ')}
         </p>
         <p style="color: #666; font-size: 12px; margin-top: 40px;">
           Gamet – Producent Lamp Ostrzegawczych<br>

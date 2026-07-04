@@ -57,6 +57,54 @@ model AdminUser {
   createdAt DateTime @default(now())
 }
 
+model Klient {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  contact   String?
+  createdAt DateTime @default(now())
+  lampy     Lampa[]
+}
+
+model WariantOrion {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  color     Color
+  opis      String
+  nT2       Int      @default(4)
+  nXF       Int
+  nXB       Int
+  nHF       Int
+  nHB       Int
+  nHS       Int
+  xrRed     Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Plyta {
+  id        String   @id @default(cuid())
+  symbol    String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Lampa {
+  id             String    @id @default(cuid())
+  serialNumber   String    @unique
+  model          String
+  variantCode    String
+  color          Color
+  voltage        String
+  lengthMm       Int?
+  orderRef       String?
+  customerId     String
+  customer       Klient    @relation(fields: [customerId], references: [id])
+  productionDate DateTime?
+  notes          String?
+  createdById    String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
 enum TicketStatus {
   NEW
   IN_PROGRESS

@@ -64,3 +64,8 @@ enum TicketStatus {
   COMPLETED
   CLOSED
 }
+enum Color {
+  A
+  R
+  B
+}

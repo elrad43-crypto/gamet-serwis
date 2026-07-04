@@ -33,6 +33,12 @@ export default async function AdminLayout({
           >
             Nowe zgłoszenie
           </Link>
+          <Link
+            href="/admin/lampy/nowa"
+            className="text-sm text-gray-600 hover:text-gray-900"
+          >
+            Nowa lampa
+          </Link>
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-500">{session.user.name}</span>

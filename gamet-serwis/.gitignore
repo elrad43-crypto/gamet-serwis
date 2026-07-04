@@ -42,6 +42,7 @@ next-env.d.ts
 
 /app/generated/prisma
 create-admin.mjs
+reset-admin-password.mjs
 
 # local test scripts and outputs
 test-*.mts

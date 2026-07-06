@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { OTHER_LAMP_MODEL } from '@/lib/lamp-types'
@@ -73,6 +73,59 @@ export default function NoweZgloszenieForm({
       return true
     })
   }, [form.clientName, form.companyName, form.clientEmail, form.clientPhone, clientSuggestions])
+
+  useEffect(() => {
+    const name = form.clientName.trim().toLowerCase()
+    if (name) {
+      const nameMatches = clientSuggestions.filter(
+        (c) => c.clientName.trim().toLowerCase() === name
+      )
+      if (nameMatches.length === 1) {
+        const match = nameMatches[0]
+        setForm((prev) => ({
+          ...prev,
+          companyName: prev.companyName || match.companyName || prev.companyName,
+          clientEmail: prev.clientEmail || match.clientEmail,
+          clientPhone: prev.clientPhone || match.clientPhone || prev.clientPhone,
+        }))
+        setErrors((prev) => ({
+          ...prev,
+          companyName: undefined,
+          clientEmail: undefined,
+          clientPhone: undefined,
+        }))
+        return
+      }
+    }
+
+    const company = form.companyName.trim().toLowerCase()
+    if (company) {
+      const companyMatches = clientSuggestions.filter(
+        (c) => c.companyName?.trim().toLowerCase() === company
+      )
+      if (companyMatches.length > 0) {
+        const first = companyMatches[0]
+        const allSameEmail =
+          first.clientEmail.trim() !== '' &&
+          companyMatches.every((c) => c.clientEmail.trim() === first.clientEmail.trim())
+        const allSamePhone =
+          (first.clientPhone ?? '').trim() !== '' &&
+          companyMatches.every(
+            (c) => (c.clientPhone ?? '').trim() === (first.clientPhone ?? '').trim()
+          )
+
+        if (allSameEmail || allSamePhone) {
+          setForm((prev) => ({
+            ...prev,
+            clientEmail: prev.clientEmail || (allSameEmail ? first.clientEmail : prev.clientEmail),
+            clientPhone:
+              prev.clientPhone || (allSamePhone ? first.clientPhone ?? prev.clientPhone : prev.clientPhone),
+          }))
+          setErrors((prev) => ({ ...prev, clientEmail: undefined, clientPhone: undefined }))
+        }
+      }
+    }
+  }, [form.clientName, form.companyName, clientSuggestions])
 
   const clientNameOptions = useMemo(
     () => Array.from(new Set(matchingClients.map((c) => c.clientName).filter(Boolean))),

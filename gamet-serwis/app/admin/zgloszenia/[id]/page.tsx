@@ -121,7 +121,7 @@ export default async function TicketDetailPage({
           <div>
             <span className="text-gray-500">Zgłoszono:</span>{' '}
             <span>{new Date(ticket.createdAt).toLocaleDateString('pl-PL', {
-              year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+              year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Warsaw'
             })}</span>
           </div>
         </div>
@@ -143,7 +143,7 @@ export default async function TicketDetailPage({
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-xs text-gray-400">
                     {new Date(note.createdAt).toLocaleDateString('pl-PL', {
-                      day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                      day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Warsaw'
                     })}
                   </span>
                   {note.isPublic && (

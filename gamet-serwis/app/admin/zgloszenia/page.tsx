@@ -169,7 +169,7 @@ export default async function ZgloszeniaPage({
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-xs">
-                      {new Date(ticket.createdAt).toLocaleDateString('pl-PL')}
+                      {new Date(ticket.createdAt).toLocaleDateString('pl-PL', { timeZone: 'Europe/Warsaw' })}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link

@@ -29,6 +29,9 @@ interface ClientSuggestion {
   clientName: string
   clientEmail: string
   clientPhone: string | null
+  shippingStreet: string | null
+  shippingPostalCode: string | null
+  shippingCity: string | null
 }
 
 export default function NoweZgloszenieForm({
@@ -87,6 +90,9 @@ export default function NoweZgloszenieForm({
           companyName: prev.companyName || match.companyName || prev.companyName,
           clientEmail: prev.clientEmail || match.clientEmail,
           clientPhone: prev.clientPhone || match.clientPhone || prev.clientPhone,
+          shippingStreet: prev.shippingStreet || match.shippingStreet || prev.shippingStreet,
+          shippingPostalCode: prev.shippingPostalCode || match.shippingPostalCode || prev.shippingPostalCode,
+          shippingCity: prev.shippingCity || match.shippingCity || prev.shippingCity,
         }))
         setErrors((prev) => ({
           ...prev,
@@ -113,13 +119,35 @@ export default function NoweZgloszenieForm({
           companyMatches.every(
             (c) => (c.clientPhone ?? '').trim() === (first.clientPhone ?? '').trim()
           )
+        const allSameStreet =
+          (first.shippingStreet ?? '').trim() !== '' &&
+          companyMatches.every(
+            (c) => (c.shippingStreet ?? '').trim() === (first.shippingStreet ?? '').trim()
+          )
+        const allSamePostal =
+          (first.shippingPostalCode ?? '').trim() !== '' &&
+          companyMatches.every(
+            (c) => (c.shippingPostalCode ?? '').trim() === (first.shippingPostalCode ?? '').trim()
+          )
+        const allSameCity =
+          (first.shippingCity ?? '').trim() !== '' &&
+          companyMatches.every(
+            (c) => (c.shippingCity ?? '').trim() === (first.shippingCity ?? '').trim()
+          )
 
-        if (allSameEmail || allSamePhone) {
+        if (allSameEmail || allSamePhone || allSameStreet || allSamePostal || allSameCity) {
           setForm((prev) => ({
             ...prev,
             clientEmail: prev.clientEmail || (allSameEmail ? first.clientEmail : prev.clientEmail),
             clientPhone:
               prev.clientPhone || (allSamePhone ? first.clientPhone ?? prev.clientPhone : prev.clientPhone),
+            shippingStreet:
+              prev.shippingStreet || (allSameStreet ? first.shippingStreet ?? prev.shippingStreet : prev.shippingStreet),
+            shippingPostalCode:
+              prev.shippingPostalCode ||
+              (allSamePostal ? first.shippingPostalCode ?? prev.shippingPostalCode : prev.shippingPostalCode),
+            shippingCity:
+              prev.shippingCity || (allSameCity ? first.shippingCity ?? prev.shippingCity : prev.shippingCity),
           }))
           setErrors((prev) => ({ ...prev, clientEmail: undefined, clientPhone: undefined }))
         }

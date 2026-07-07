@@ -12,7 +12,15 @@ export default async function NoweZgloszeniePage() {
 
   const clientRows = await prisma.ticket.findMany({
     where: { companyName: { not: null } },
-    select: { companyName: true, clientName: true, clientEmail: true, clientPhone: true },
+    select: {
+      companyName: true,
+      clientName: true,
+      clientEmail: true,
+      clientPhone: true,
+      shippingStreet: true,
+      shippingPostalCode: true,
+      shippingCity: true,
+    },
   })
 
   return <NoweZgloszenieForm companyNames={companyNames} clientSuggestions={clientRows} />
